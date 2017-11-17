@@ -6,6 +6,7 @@ var controller = require('./disk.controller');
 
 var router = express.Router();
 
-router.get('/', auth.isAuthenticated(), controller.index);
+// router.get('/', auth.isAuthenticated(), controller.index);
+router.get('/', controller.index);
 
 module.exports = router;

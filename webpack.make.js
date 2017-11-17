@@ -2,8 +2,8 @@
 /*eslint-env node*/
 var webpack = require('webpack');
 var autoprefixer = require('autoprefixer');
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
+// var HtmlWebpackPlugin = require('html-webpack-plugin');
+// var HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 var CommonsChunkPlugin = webpack.optimize.CommonsChunkPlugin;
 var fs = require('fs');
@@ -38,21 +38,22 @@ module.exports = function makeWebpackConfig(options) {
         config.entry = {};
     } else {
         config.entry = {
-            app: './client/app/app.js',
-            polyfills: './client/polyfills.js',
-            vendor: [
-                'angular',
-                'angular-animate',
-                'angular-aria',
-                'angular-cookies',
-                'angular-resource',
-
-                'angular-sanitize',
-                'angular-socket-io',
-                'angular-ui-bootstrap',
-                'angular-ui-router',
-                'lodash'
-            ]
+            app: './src/app.js'
+            // app: './client/app/app.js',
+            // polyfills: './client/polyfills.js',
+            // vendor: [
+            //     'angular',
+            //     'angular-animate',
+            //     'angular-aria',
+            //     'angular-cookies',
+            //     'angular-resource',
+            //
+            //     'angular-sanitize',
+            //     'angular-socket-io',
+            //     'angular-ui-bootstrap',
+            //     'angular-ui-router',
+            //     'lodash'
+            // ]
         };
     }
 
@@ -67,7 +68,8 @@ module.exports = function makeWebpackConfig(options) {
     } else {
         config.output = {
             // Absolute output directory
-            path: BUILD ? path.join(__dirname, '/dist/client/') : path.join(__dirname, '/.tmp/'),
+            // path: BUILD ? path.join(__dirname, '/dist/client/') : path.join(__dirname, '/.tmp/'),
+            path: BUILD ? path.join(__dirname, '/dist/') : path.join(__dirname, '/.tmp/'),
 
             // Output path from the view of the page
             // Uses webpack-dev-server in development
@@ -139,7 +141,7 @@ module.exports = function makeWebpackConfig(options) {
             test: /\.js$/,
             loader: 'babel',
             include: [
-                path.resolve(__dirname, 'client/'),
+                // path.resolve(__dirname, 'client/'),
                 path.resolve(__dirname, 'node_modules/lodash-es/')
             ]
         }, {
@@ -152,60 +154,61 @@ module.exports = function makeWebpackConfig(options) {
                 tsconfig: path.resolve(__dirname, 'tsconfig.client.json')
             },
             include: [
-                path.resolve(__dirname, 'client/')
+                path.resolve(__dirname, 'src/')
             ]
         }, {
-            // ASSET LOADER
-            // Reference: https://github.com/webpack/file-loader
-            // Copy png, jpg, jpeg, gif, svg, woff, woff2, ttf, eot files to output
-            // Rename the file using the asset hash
-            // Pass along the updated reference to your code
-            // You can add here any file extension you want to get copied to your output
-            test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)([\?]?.*)$/,
-            loader: 'file'
-        }, {
-
-            // HTML LOADER
-            // Reference: https://github.com/webpack/raw-loader
-            // Allow loading html through js
-            test: /\.html$/,
-            loader: 'raw'
-        }, {
-            // CSS LOADER
-            // Reference: https://github.com/webpack/css-loader
-            // Allow loading css through js
-            //
-            // Reference: https://github.com/postcss/postcss-loader
-            // Postprocess your css with PostCSS plugins
-            test: /\.css$/,
-            loader: !TEST
-                // Reference: https://github.com/webpack/extract-text-webpack-plugin
-                // Extract css files in production builds
-                //
-                // Reference: https://github.com/webpack/style-loader
-                // Use style-loader in development for hot-loading
-                ? ExtractTextPlugin.extract('style', 'css!postcss')
-                // Reference: https://github.com/webpack/null-loader
-                // Skip loading css in test mode
-                : 'null'
-        }, {
-            // SASS LOADER
-            // Reference: https://github.com/jtangelder/sass-loader
-            test: /\.(scss|sass)$/,
-            loaders: ['style', 'css', 'sass'],
-            include: [
-                path.resolve(__dirname, 'client/app/app.scss'),
-                path.resolve(__dirname, 'node_modules/bootstrap-sass/assets/stylesheets/*.scss')
-            ]
-
-
+          // ASSET LOADER
+          // Reference: https://github.com/webpack/file-loader
+          // Copy png, jpg, jpeg, gif, svg, woff, woff2, ttf, eot files to output
+          // Rename the file using the asset hash
+          // Pass along the updated reference to your code
+          // You can add here any file extension you want to get copied to your output
+          test: /\.(png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)([\?]?.*)$/,
+          loader: 'file'
         }]
+        // }, {
+        //
+        //     // HTML LOADER
+        //     // Reference: https://github.com/webpack/raw-loader
+        //     // Allow loading html through js
+        //     test: /\.html$/,
+        //     loader: 'raw'
+        // }, {
+        //     // CSS LOADER
+        //     // Reference: https://github.com/webpack/css-loader
+        //     // Allow loading css through js
+        //     //
+        //     // Reference: https://github.com/postcss/postcss-loader
+        //     // Postprocess your css with PostCSS plugins
+        //     test: /\.css$/,
+        //     loader: !TEST
+        //         // Reference: https://github.com/webpack/extract-text-webpack-plugin
+        //         // Extract css files in production builds
+        //         //
+        //         // Reference: https://github.com/webpack/style-loader
+        //         // Use style-loader in development for hot-loading
+        //         ? ExtractTextPlugin.extract('style', 'css!postcss')
+        //         // Reference: https://github.com/webpack/null-loader
+        //         // Skip loading css in test mode
+        //         : 'null'
+        // }, {
+        //     // SASS LOADER
+        //     // Reference: https://github.com/jtangelder/sass-loader
+        //     test: /\.(scss|sass)$/,
+        //     loaders: ['style', 'css', 'sass'],
+        //     include: [
+        //         path.resolve(__dirname, 'client/app/app.scss'),
+        //         path.resolve(__dirname, 'node_modules/bootstrap-sass/assets/stylesheets/*.scss')
+        //     ]
+        //
+        //
+        // }]
     };
 
-    config.module.postLoaders = [{
-        test: /\.js$/,
-        loader: 'ng-annotate?single_quotes'
-    }];
+    // config.module.postLoaders = [{
+    //     test: /\.js$/,
+    //     loader: 'ng-annotate?single_quotes'
+    // }];
 
     // ISPARTA INSTRUMENTER LOADER
     // Reference: https://github.com/ColCh/isparta-instrumenter-loader
@@ -231,11 +234,11 @@ module.exports = function makeWebpackConfig(options) {
      * Reference: https://github.com/postcss/autoprefixer-core
      * Add vendor prefixes to your css
      */
-    config.postcss = [
-        autoprefixer({
-            browsers: ['last 2 version']
-        })
-    ];
+    // config.postcss = [
+    //     autoprefixer({
+    //         browsers: ['last 2 version']
+    //     })
+    // ];
 
     /**
      * Plugins
@@ -275,17 +278,17 @@ module.exports = function makeWebpackConfig(options) {
     // Skip rendering index.html in test mode
     // Reference: https://github.com/ampedandwired/html-webpack-plugin
     // Render index.html
-    if(!TEST) {
-        let htmlConfig = {
-            template: 'client/_index.html',
-            filename: '../client/index.html',
-            alwaysWriteToDisk: true
-        }
-        config.plugins.push(
-          new HtmlWebpackPlugin(htmlConfig),
-          new HtmlWebpackHarddiskPlugin()
-        );
-    }
+    // if(!TEST) {
+    //     let htmlConfig = {
+    //         template: 'client/_index.html',
+    //         filename: '../client/index.html',
+    //         alwaysWriteToDisk: true
+    //     }
+    //     config.plugins.push(
+    //       new HtmlWebpackPlugin(htmlConfig),
+    //       new HtmlWebpackHarddiskPlugin()
+    //     );
+    // }
 
     // Add build specific plugins
     if(BUILD) {
@@ -300,15 +303,15 @@ module.exports = function makeWebpackConfig(options) {
 
             // Reference: http://webpack.github.io/docs/list-of-plugins.html#uglifyjsplugin
             // Minify all javascript, switch loaders to minimizing mode
-            new webpack.optimize.UglifyJsPlugin({
-                mangle: false,
-                output: {
-                    comments: false
-                },
-                compress: {
-                    warnings: false
-                }
-            }),
+            // new webpack.optimize.UglifyJsPlugin({
+            //     mangle: false,
+            //     output: {
+            //         comments: false
+            //     },
+            //     compress: {
+            //         warnings: false
+            //     }
+            // }),
 
             // Reference: https://webpack.github.io/docs/list-of-plugins.html#defineplugin
             // Define free global variables
@@ -316,13 +319,13 @@ module.exports = function makeWebpackConfig(options) {
                 'process.env': {
                     NODE_ENV: '"production"'
                 }
-            }),
-            new webpack.ProvidePlugin({
-                $: "jquery",
-                jQuery: "jquery",
-                "window.jQuery": "jquery",
-                "window.Tether": 'tether',
-                "Tether": 'tether'
+            // }),
+            // new webpack.ProvidePlugin({
+            //     $: "jquery",
+            //     jQuery: "jquery",
+            //     "window.jQuery": "jquery",
+            //     "window.Tether": 'tether',
+            //     "Tether": 'tether'
             })
         );
     }
@@ -335,13 +338,13 @@ module.exports = function makeWebpackConfig(options) {
                 'process.env': {
                     NODE_ENV: '"development"'
                 }
-            }),
-            new webpack.ProvidePlugin({
-                $: "jquery",
-                jQuery: "jquery",
-                "window.jQuery": "jquery",
-                "window.Tether": 'tether',
-                "Tether": 'tether'
+            // }),
+            // new webpack.ProvidePlugin({
+            //     $: "jquery",
+            //     jQuery: "jquery",
+            //     "window.jQuery": "jquery",
+            //     "window.Tether": 'tether',
+            //     "Tether": 'tether'
             })
         );
     }
@@ -362,7 +365,8 @@ module.exports = function makeWebpackConfig(options) {
      * Reference: http://webpack.github.io/docs/webpack-dev-server.html
      */
     config.devServer = {
-        contentBase: './client/',
+      // contentBase: './client/',
+        contentBase: './',
         stats: {
             modules: false,
             cached: false,
@@ -378,6 +382,22 @@ module.exports = function makeWebpackConfig(options) {
         clearImmediate: false,
         setImmediate: false
     };
+
+  config.module.loaders.push({
+    loader: 'json-loader',
+    test: /\.json$/
+  });
+
+  config.module.loaders.push({
+    loader: 'source-map-loader',
+    test: /\.js.map$/
+  });
+
+  config.target = 'node';
+
+    // console.log('*****************');
+    // console.log(config);
+    // console.log('*****************');
 
     return config;
 };

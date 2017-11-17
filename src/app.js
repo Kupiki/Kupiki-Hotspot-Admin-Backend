@@ -9,7 +9,7 @@ import sqldb from './sqldb/localDb';
 import config from './config/environment';
 import http from 'http';
 import seedDatabaseIfNeeded from './config/seed';
-import path from 'path';
+// import path from 'path';
 
 // Setup server
 var app = express();

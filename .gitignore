@@ -3,8 +3,6 @@ public
 .tmp
 .sass-cache
 .idea
-client/bower_components
-client/index.html
 dist
 server/config/local.env.js
 npm-debug.log
@@ -12,5 +10,4 @@ coverage
 dev.sqlite
 package-lock.json
 dist.sqlite
-.yo-rc.json
 deployment-config.json

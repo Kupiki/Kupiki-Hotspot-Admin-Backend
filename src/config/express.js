@@ -5,7 +5,7 @@
 'use strict';
 
 import express from 'express';
-import favicon from 'serve-favicon';
+// import favicon from 'serve-favicon';
 import morgan from 'morgan';
 import shrinkRay from 'shrink-ray';
 import bodyParser from 'body-parser';
@@ -28,9 +28,11 @@ export default function(app) {
     app.use(express.static(path.join(config.root, '.tmp')));
   }
 
+/*
   if(env === 'production') {
     app.use(favicon(path.join(config.root, 'client', 'favicon.ico')));
   }
+*/
 
   app.set('appPath', path.join(config.root, 'client'));
   app.use(express.static(app.get('appPath')));
