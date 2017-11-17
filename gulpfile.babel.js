@@ -22,23 +22,8 @@ import makeWebpackConfig from './webpack.make';
 var plugins = gulpLoadPlugins();
 var config;
 
-// const clientPath = 'client';
 const serverPath = 'src';
 const paths = {
-    // client: {
-    //     assets: `${clientPath}/assets/**/*`,
-    //     images: `${clientPath}/assets/images/**/*`,
-    //     revManifest: `${clientPath}/assets/rev-manifest.json`,
-    //     scripts: [
-    //         `${clientPath}/**/!(*.spec|*.mock).js`
-    //     ],
-    //     styles: [`${clientPath}/{app,components}/**/*.scss`],
-    //     mainStyle: `${clientPath}/app/app.scss`,
-    //     views: `${clientPath}/{app,components}/**/*.html`,
-    //     mainView: `${clientPath}/index.html`,
-    //     test: [`${clientPath}/{app,components}/**/*.{spec,mock}.js`],
-    //     e2e: ['e2e/**/*.spec.js']
-    // },
     server: {
         scripts: [
           `${serverPath}/**/!(*.spec|*.integration).js`,
@@ -95,19 +80,7 @@ function whenServerReady(cb) {
  ********************/
 
 let lintClientScripts = lazypipe()
-    // .pipe(plugins.eslint, `${clientPath}/.eslintrc`)
     .pipe(plugins.eslint.format);
-
-// const lintClientTestScripts = lazypipe()
-//     .pipe(plugins.eslint, {
-//         configFile: `${clientPath}/.eslintrc`,
-//         envs: [
-//             'browser',
-//             'es6',
-//             'mocha'
-//         ]
-//     })
-//     .pipe(plugins.eslint.format);
 
 let lintServerScripts = lazypipe()
     .pipe(plugins.eslint, `${serverPath}/.eslintrc`)
@@ -188,28 +161,6 @@ gulp.task('env:prod', () => {
  * Tasks
  ********************/
 
-// gulp.task('inject', cb => {
-//     runSequence(['inject:scss'], cb);
-// });
-
-// gulp.task('inject:scss', () => {
-//     return gulp.src(paths.client.mainStyle)
-//         .pipe(plugins.inject(
-//             gulp.src(_.union(paths.client.styles, ['!' + paths.client.mainStyle]), {read: false})
-//                 .pipe(plugins.sort()),
-//             {
-//                 transform: (filepath) => {
-//                     let newPath = filepath
-//                         .replace(`/${clientPath}/app/`, '')
-//                         .replace(`/${clientPath}/components/`, '../components/')
-//                         .replace(/_(.*).scss/, (match, p1, offset, string) => p1)
-//                         .replace('.scss', '');
-//                     return `@import '${newPath}';`;
-//                 }
-//             }))
-//         .pipe(gulp.dest(`${clientPath}/app`));
-// });
-
 gulp.task('webpack:dev', function() {
     const webpackDevConfig = makeWebpackConfig({ DEV: true });
     return gulp.src(webpackDevConfig.entry.app)
@@ -225,7 +176,6 @@ gulp.task('webpack:dist', function() {
         .on('error', (err) => {
           this.emit('end'); // Recover from errors
         })
-      // .pipe(gulp.dest(`${paths.dist}/client`));
       .pipe(gulp.dest(`${paths.dist}/`));
 });
 
@@ -255,26 +205,12 @@ gulp.task('transpile:server', () => {
         .pipe(gulp.dest(`${paths.dist}/${serverPath}`));
 });
 
-// gulp.task('lint:scripts', cb => runSequence(['lint:scripts:client', 'lint:scripts:server'], cb));
 gulp.task('lint:scripts', cb => runSequence(['lint:scripts:server'], cb));
-
-// gulp.task('lint:scripts:client', () => {
-//     return gulp.src(_.union(
-//         paths.client.scripts,
-//         _.map(paths.client.test, blob => '!' + blob)
-//     ))
-//         .pipe(lintClientScripts());
-// });
 
 gulp.task('lint:scripts:server', () => {
     return gulp.src(_.union(paths.server.scripts, _.map(paths.server.test, blob => '!' + blob)))
         .pipe(lintServerScripts());
 });
-
-// gulp.task('lint:scripts:clientTest', () => {
-//     return gulp.src(paths.client.test)
-//         .pipe(lintClientScripts());
-// });
 
 gulp.task('lint:scripts:serverTest', () => {
     return gulp.src(paths.server.test)
@@ -282,20 +218,12 @@ gulp.task('lint:scripts:serverTest', () => {
 });
 
 gulp.task('jscs', () => {
-  // return gulp.src(_.union(paths.client.scripts, paths.server.scripts))
   return gulp.src(_.union(paths.server.scripts))
       .pipe(plugins.jscs())
       .pipe(plugins.jscs.reporter());
 });
 
 gulp.task('clean:tmp', () => del(['.tmp/**/*'], {dot: true}));
-
-// gulp.task('start:client', cb => {
-//     whenServerReady(() => {
-//         open('http://localhost:' + config.browserSyncPort);
-//         cb();
-//     });
-// });
 
 gulp.task('start:server', () => {
     process.env.NODE_ENV = process.env.NODE_ENV || 'development';
@@ -320,7 +248,6 @@ gulp.task('start:server:debug', () => {
 });
 
 gulp.task('watch', () => {
-    // var testFiles = _.union(paths.client.test, paths.server.test.unit, paths.server.test.integration);
     var testFiles = _.union(paths.server.test.unit, paths.server.test.integration);
 
     plugins.watch(_.union(paths.server.scripts, testFiles))
@@ -337,12 +264,8 @@ gulp.task('serve', cb => {
         [
             'clean:tmp',
             // 'lint:scripts',
-            // 'inject',
-            // 'copy:fonts:dev',
             'env:all'
         ],
-        // 'webpack:dev',
-        // ['start:server', 'start:client'],
         ['start:server'],
         'watch',
         cb
@@ -354,12 +277,9 @@ gulp.task('serve:debug', cb => {
         [
             'clean:tmp',
             'lint:scripts',
-            // 'inject',
-            // 'copy:fonts:dev',
             'env:all'
         ],
         'webpack:dev',
-        // ['start:server:debug', 'start:client'],
         ['start:server:debug'],
         'watch',
         cb
@@ -371,13 +291,11 @@ gulp.task('serve:dist', cb => {
         'build',
         'env:all',
         'env:prod',
-        // ['start:server:prod', 'start:client'],
         ['start:server:prod'],
         cb);
 });
 
 gulp.task('test', cb => {
-  // return runSequence('test:server', 'test:client', cb);
   return runSequence('test:server', cb);
 });
 
@@ -484,38 +402,6 @@ gulp.task('build', cb => {
 
 gulp.task('clean:dist', () => del([`${paths.dist}/!(.git*|.openshift|Procfile)**`], {dot: true}));
 
-// gulp.task('build:images', () => {
-//     return gulp.src(paths.client.images)
-//         .pipe(plugins.imagemin([
-//             plugins.imagemin.optipng({optimizationLevel: 5}),
-//             plugins.imagemin.jpegtran({progressive: true}),
-//             plugins.imagemin.gifsicle({interlaced: true}),
-//             plugins.imagemin.svgo({plugins: [{removeViewBox: false}]})
-//         ]))
-//         .pipe(plugins.rev())
-//         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets/images`))
-//         .pipe(plugins.rev.manifest(`${paths.dist}/${paths.client.revManifest}`, {
-//             base: `${paths.dist}/${clientPath}/assets`,
-//             merge: true
-//         }))
-//         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets`));
-// });
-
-// gulp.task('revReplaceWebpack', function() {
-//     return gulp.src('dist/client/app.*.js')
-//         .pipe(plugins.revReplace({manifest: gulp.src(`${paths.dist}/${paths.client.revManifest}`)}))
-//         .pipe(gulp.dest('dist/client'));
-// });
-
-// gulp.task('copy:extras', () => {
-//     return gulp.src([
-//         `${clientPath}/favicon.ico`,
-//         `${clientPath}/robots.txt`,
-//         `${clientPath}/.htaccess`
-//     ], { dot: true })
-//         .pipe(gulp.dest(`${paths.dist}/${clientPath}`));
-// });
-
 /**
  * turns 'bootstrap/fonts/font.woff' into 'bootstrap/font.woff'
  */
@@ -534,21 +420,6 @@ function flatten() {
         next();
     });
 }
-// gulp.task('copy:fonts:dev', () => {
-//     return gulp.src('node_modules/{bootstrap,font-awesome}/fonts/*')
-//         .pipe(flatten())
-//         .pipe(gulp.dest(`${clientPath}/assets/fonts`));
-// });
-// gulp.task('copy:fonts:dist', () => {
-//     return gulp.src('node_modules/{bootstrap,font-awesome}/fonts/*')
-//         .pipe(flatten())
-//         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets/fonts`));
-// });
-
-// gulp.task('copy:assets', () => {
-//     return gulp.src([paths.client.assets, '!' + paths.client.images])
-//         .pipe(gulp.dest(`${paths.dist}/${clientPath}/assets`));
-// });
 
 gulp.task('copy:server', () => {
     return gulp.src([
