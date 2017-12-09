@@ -8,11 +8,13 @@ import express from 'express';
 import sqldb from './sqldb/localDb';
 import config from './config/environment';
 import http from 'http';
+import cors from 'cors';
 import seedDatabaseIfNeeded from './config/seed';
 // import path from 'path';
 
 // Setup server
 var app = express();
+app.use(cors());
 var server = http.createServer(app);
 var socketio = require('socket.io')(server, {
   serveClient: config.env !== 'production',

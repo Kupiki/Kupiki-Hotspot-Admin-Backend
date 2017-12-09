@@ -14,7 +14,7 @@ export function index(req, res) {
   //   minutes: 0
   // };
 
-  res.status(200).json(os.uptime());
+  res.status(200).json({'uptime': os.uptime()});
   // var uptime_commands = {
   //   linux : "uptime | awk -F'( |,|:)+' '{if ($7==\"min\") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,\",\",h+0,\",\",m+0}'",
   //   Darwin : "uptime | awk -F'( |,|:)+' '{d=0;h=$4;m=$5} {print d+0,\",\",h+0,\",\"m+0}'"
