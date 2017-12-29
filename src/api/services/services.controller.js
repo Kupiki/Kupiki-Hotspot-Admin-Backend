@@ -2,6 +2,8 @@
 
 import * as script from '../../system/system.service';
 
+// let filteredServices = [ 'hostapd', 'mysql', 'nginx', 'freeradius' ];
+
 export function index(req, res) {
   script.execPromise('services')
     .then(function (result) {
@@ -11,7 +13,8 @@ export function index(req, res) {
           var arrTmp = elt.trim().split(/[\s\t]+/);
           services.push({
             name: arrTmp[3],
-            status: (arrTmp[1] === '+' ? true : false)
+            status: (arrTmp[1] === '+' ? true : false),
+            // hotspot: (filteredServices.indexOf(arrTmp[3]) === -1 ? false : true)
           });
         }
       });
