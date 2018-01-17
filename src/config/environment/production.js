@@ -35,5 +35,11 @@ module.exports = {
       insecureAuth : true
     }
   },
+
+  client: {
+    host: '192.168.10.160',
+    port: '3000'
+  },
+
   seedDB: true
 };

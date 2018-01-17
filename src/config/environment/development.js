@@ -27,6 +27,11 @@ module.exports = {
     }
   },
 
+  client: {
+    host: '192.168.10.160',
+    port: '3000'
+  },
+  
   // Seed database on startup
   seedDB: true
 

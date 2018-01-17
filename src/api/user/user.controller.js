@@ -153,7 +153,7 @@ export function authCallback(req, res) {
 }
 
 export function setLanguage(req, res) {
-  console.log(req.body)
+  // console.log(req.body)
 
   var userId = req.body._id;
 
@@ -163,7 +163,7 @@ export function setLanguage(req, res) {
     }
   })
     .then(user => {
-      console.log(user)
+      // console.log(user)
       if(!user) {
         res.status(200).json({ status: 'failed', result: { code : 500, message : 'Unable to save user language.'} });
       }

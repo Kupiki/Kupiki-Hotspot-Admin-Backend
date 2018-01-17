@@ -72,10 +72,11 @@ export function update(req, res) {
       .then(function (result) {
         script.execPromise('system upgrade')
           .then(function (result) {
+            socket.emit('system:update', {status: 'finished', result: ''});
             res.status(200).json({status: 'success', result: {code: 0, message: 'System updated finished.'}});
           })
           .catch(function (err) {
-            console.log('System ugrade error');
+            console.log('System update error');
             console.log(err);
             res.status(200).json({status: 'failed', result: {code: err.code, message: err.stderr}});
           })
