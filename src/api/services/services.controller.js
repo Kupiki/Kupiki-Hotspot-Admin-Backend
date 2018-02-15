@@ -2,8 +2,6 @@
 
 import * as script from '../../system/system.service';
 
-// let filteredServices = [ 'hostapd', 'mysql', 'nginx', 'freeradius' ];
-
 export function index(req, res) {
   script.execPromise('services')
     .then(function (result) {

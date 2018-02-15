@@ -21,6 +21,7 @@ export default function(app) {
   app.use('/api/hotspot', require('./api/hotspot'));
   app.use('/api/portal', require('./api/portal'));
   app.use('/api/temperature', require('./api/temperature'));
+  app.use('/api/netflow', require('./api/netflow'));
 
   app.use('/auth', require('./auth').default);
 

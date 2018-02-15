@@ -132,9 +132,9 @@ export function setConfiguration(req, res) {
                   .catch(function (error) {
                     res.status(200).json({ status: 'failed', result: { code : error.code, message : error.stderr }});
                   });
-                } else {
-                  res.status(200).json({ status: 'success', result: { code : 0, message : '' }});
-                }
+              } else {
+                res.status(200).json({ status: 'success', result: { code : 0, message : '' }});
+              }
             })
             .catch(function(error) {
               console.log(error);

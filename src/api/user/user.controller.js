@@ -153,8 +153,6 @@ export function authCallback(req, res) {
 }
 
 export function setLanguage(req, res) {
-  // console.log(req.body)
-
   var userId = req.body._id;
 
   User.findOne({
