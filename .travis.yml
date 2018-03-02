@@ -8,7 +8,7 @@ matrix:
 before_script:
   - npm install -g gulp-cli node-gyp
   - gem install sass
-services: mongodb
+after_success: 'npm run coveralls'
 cache:
   directories:
     - node_modules
