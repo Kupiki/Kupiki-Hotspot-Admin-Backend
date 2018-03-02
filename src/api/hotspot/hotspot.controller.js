@@ -34,8 +34,13 @@ export function getConfigurationFields(req, res) {
     },
     ssid: {
       display: 'SSID',
-      help: 'Name that will be visible on users\' devices',
-      type: 'text'
+      help: 'Name that will be visible on users\' devices. Minimal length: 3 characters. Maximum length: 255 characters.',
+      type: 'text',
+      data: {
+        required: true,
+        minLength: {value: 3},
+        maxLength: {value: 255}
+      }
     },
     hw_mode: {
       display: 'Wifi mode',
@@ -111,7 +116,7 @@ export function setConfiguration(req, res) {
         console.log(error);
         res.status(200).json({status: 'failed', result: {code: error.errno, message: error }});
       } else {
-        var stream = fs.createWriteStream('/tmp/hostapd.conf');
+        let stream = fs.createWriteStream('/tmp/hostapd.conf');
         stream.once('open', function(fd) {
           for (var i = 0; i < fields.length; i++) {
             stream.write(fields[i].field+'='+fields[i].value+'\n');

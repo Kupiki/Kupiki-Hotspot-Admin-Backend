@@ -41,10 +41,11 @@ export function checkUserConnectivity(req, res) {
 }
 
 export function getUsers(req, res) {
-  let findUsers = "SELECT username, firstname, lastname FROM userinfo UNION DISTINCT SELECT radcheck.username, userinfo.firstname, userinfo.lastname FROM radcheck, userinfo WHERE radcheck.username = userinfo.username UNION DISTINCT SELECT radreply.username, userinfo.firstname, userinfo.lastname FROM radreply, userinfo WHERE radreply.username = userinfo.username";
+  // let findUsers = "SELECT username, firstname, lastname FROM userinfo UNION DISTINCT SELECT radcheck.username, userinfo.firstname, userinfo.lastname FROM radcheck, userinfo WHERE radcheck.username = userinfo.username UNION DISTINCT SELECT radreply.username, userinfo.firstname, userinfo.lastname FROM radreply, userinfo WHERE radreply.username = userinfo.username";
+  let findUsers = "SELECT * FROM userinfo";
   freeradiusDb.sequelize.query(findUsers, { type: Sequelize.QueryTypes.SELECT })
     .then(users => {
-      res.status(200).json(users);
+      res.status(200).json({status: 'success', result: {code: 0, message: users }});
     })
     .catch(handleError(res));
 }
@@ -165,24 +166,17 @@ export function getUserRadcheck(req, res) {
 }
 
 export function saveUserRadcheck(req, res) {
-  console.log(req.query.radcheck);
-
   let attributes = [];
-  (Array.isArray(req.query.radcheck))?attributes = req.query.radcheck:attributes.push(req.query.radcheck);
-
-  console.log(attributes)
-
-  if ( req.query.username ) {
+  (Array.isArray(req.body.radcheck))?attributes = req.body.radcheck:attributes.push(req.body.radcheck);
+  if ( req.body.username ) {
     let asyncs = [];
 
     radcheck.destroy({
       where: {
-        username: req.query.username
+        username: req.body.username
       }
     }).then(error => {
-      attributes.forEach(attributeStr => {
-        let attribute = JSON.parse(attributeStr);
-        console.log(attribute);
+      attributes.forEach(attribute => {
         asyncs.push(function(callback) {
           radcheck.create({username: attribute.username, attribute: attribute.attribute, op: attribute.op, value: attribute.value }).then(function(result){
             callback();
@@ -200,7 +194,6 @@ export function saveUserRadcheck(req, res) {
     });
   } else {
     res.status(200).json({ status: 'failed', result: { code : 500, message : 'Attributes is not array' }});
-
   }
 }
 

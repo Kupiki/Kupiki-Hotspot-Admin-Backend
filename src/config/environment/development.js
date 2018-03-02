@@ -21,7 +21,8 @@ module.exports = {
       username: 'root',
       password: 'raspbian',
       database: 'radius',
-      host: '192.168.1.43',
+      // host: '192.168.1.43',
+      host: '127.0.0.1',
       dialect: 'mariadb',
       insecureAuth : true
     }
