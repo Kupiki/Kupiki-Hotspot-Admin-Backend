@@ -133,7 +133,7 @@ export function deleteUser(req, res) {
     if (!err) {
       res.status(200).json({ status: 'success', result: { code : 0, message : '' }});
     } else {
-      console.log(err)
+      console.log(err);
       res.status(200).json({ status: 'failed', result: { code : 500, message : 'Unable to delete userinfo and attributes' }});
     }
   });

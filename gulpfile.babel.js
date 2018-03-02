@@ -304,7 +304,6 @@ gulp.task('test:server', cb => {
         'env:all',
         'env:test',
         'mocha:unit',
-        'mocha:integration',
         cb);
 });
 
@@ -313,10 +312,10 @@ gulp.task('mocha:unit', () => {
         .pipe(mocha());
 });
 
-gulp.task('mocha:integration', () => {
-    return gulp.src(paths.server.test.integration)
-        .pipe(mocha());
-});
+// gulp.task('mocha:integration', () => {
+//     return gulp.src(paths.server.test.integration)
+//         .pipe(mocha());
+// });
 
 gulp.task('test:server:coverage', cb => {
   runSequence('coverage:pre',

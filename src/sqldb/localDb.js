@@ -1,10 +1,9 @@
 'use strict';
 
-// import path from 'path';
 import config from '../config/environment';
 import Sequelize from 'sequelize';
 
-var db = {
+let db = {
   Sequelize,
   sequelize: new Sequelize(config.sequelize.localDb.uri, config.sequelize.localDb.options)
 };
