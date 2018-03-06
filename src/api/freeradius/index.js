@@ -16,12 +16,13 @@ router.get('/user/radreply', auth.hasRole('admin'), controller.getUserRadreply);
 router.get('/user/userinfo', auth.hasRole('admin'), controller.getUserUserinfo);
 router.post('/user/userinfo', auth.hasRole('admin'), controller.saveUserUserinfo);
 
-router.get('/lastsession', auth.hasRole('admin'), controller.getLastSession);
-router.get('/sessionstotal', auth.hasRole('admin'), controller.getSessionsTotal);
-router.get('/allsessions', auth.hasRole('admin'), controller.getAllSessions);
-router.post('/check', auth.hasRole('admin'), controller.checkUserConnectivity);
-router.post('/disconnect', auth.hasRole('admin'), controller.disconnectUser);
-router.post('/delete', auth.hasRole('admin'), controller.deleteUser);
-router.post('/create', auth.hasRole('admin'), controller.createUser);
+router.get('/user/lastsession', auth.hasRole('admin'), controller.getLastSession);
+router.get('/user/sessionstotal', auth.hasRole('admin'), controller.getSessionsTotal);
+router.get('/user/allsessions', auth.hasRole('admin'), controller.getAllSessions);
+
+router.post('/user/check', auth.hasRole('admin'), controller.checkUserConnectivity);
+router.post('/user/disconnect', auth.hasRole('admin'), controller.disconnectUser);
+router.post('/user/delete', auth.hasRole('admin'), controller.deleteUser);
+// router.post('/user/create', auth.hasRole('admin'), controller.createUser);
 
 module.exports = router;

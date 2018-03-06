@@ -42,7 +42,8 @@ export function checkUserConnectivity(req, res) {
 
 export function getUsers(req, res) {
   // let findUsers = "SELECT username, firstname, lastname FROM userinfo UNION DISTINCT SELECT radcheck.username, userinfo.firstname, userinfo.lastname FROM radcheck, userinfo WHERE radcheck.username = userinfo.username UNION DISTINCT SELECT radreply.username, userinfo.firstname, userinfo.lastname FROM radreply, userinfo WHERE radreply.username = userinfo.username";
-  let findUsers = "SELECT * FROM userinfo";
+  // let findUsers = "SELECT * FROM userinfo";
+  let findUsers = "SELECT userinfo.*, radcheck.value as password, radcheck.attribute FROM userinfo, radcheck WHERE userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'"
   freeradiusDb.sequelize.query(findUsers, { type: Sequelize.QueryTypes.SELECT })
     .then(users => {
       res.status(200).json({status: 'success', result: {code: 0, message: users }});
@@ -57,14 +58,13 @@ export function getUserUserinfo(req, res) {
     },
     attributes: { exclude : ['createdAt', 'updatedAt'] }
   }).then(userInfo => {
-    // Exclude status (if created or not)
     res.status(200).json(userInfo[0]);
   })
   .catch(handleError(res));
 }
 
 export function saveUserUserinfo(req, res) {
-  var userinfoData = JSON.parse(req.query.userinfo);
+  let userinfoData = req.body.userinfo;
   return upsert(userinfo, {
       username: userinfoData.username
     }, {
@@ -109,15 +109,7 @@ function upsert(model, condition, values) {
     })
 }
 
-export function createUser(req, res) {
-  console.log(req.body);
-  userinfo.create({ username: req.body.username }).then(result => {
-    res.status(200).json({ status: 'success', result: { code : 0, message : '' }});
-  }).catch(handleError(res));
-}
-
 export function deleteUser(req, res) {
-  console.log(req.body);
   let asyncs = [];
   asyncs.push(function(callback) {
     radcheck.destroy({ where: { username: req.body.username }}).then(function(result) {

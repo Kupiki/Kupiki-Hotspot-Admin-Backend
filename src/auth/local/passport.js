@@ -10,7 +10,7 @@ function localAuthenticate(User, username, password, done) {
     .then(user => {
       if(!user) {
         return done(null, false, {
-          message: 'This user is not registered.'
+          message: 'Username or password incorrect'
         });
       }
       user.authenticate(password, function(authError, authenticated) {
@@ -18,7 +18,7 @@ function localAuthenticate(User, username, password, done) {
           return done(authError);
         }
         if(!authenticated) {
-          return done(null, false, { message: 'This password is not correct.' });
+          return done(null, false, { message: 'Username or password incorrect' });
         } else {
           return done(null, user);
         }
@@ -27,10 +27,10 @@ function localAuthenticate(User, username, password, done) {
     .catch(err => done(err));
 }
 
-export function setup(User/*, config*/) {
+export function setup(User) {
   passport.use(new LocalStrategy({
     usernameField: 'username',
-    passwordField: 'password' // this is the virtual field on the model
+    passwordField: 'password'
   }, function(username, password, done) {
     return localAuthenticate(User, username, password, done);
   }));
