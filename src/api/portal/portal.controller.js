@@ -3,7 +3,7 @@
 import * as script from '../../system/system.service';
 
 import multer from 'multer';
-var storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './client/assets/upload/');
   },
@@ -21,7 +21,7 @@ export function saveConfiguration(req, res) {
         console.log(error);
         res.status(200).json({status: 'failed', result: {code: error.errno, message: error }});
       } else {
-        var stream = fs.createWriteStream('/tmp/portal.conf');
+        let stream = fs.createWriteStream('/tmp/portal.conf');
         stream.once('open', function(fd) {
           stream.write(JSON.stringify(configuration, null, 4));
           stream.end();
@@ -50,7 +50,7 @@ export function saveConfiguration(req, res) {
 export function getConfiguration(req, res) {
   script.execPromise('portal getConfiguration')
     .then(function (result) {
-      res.status(200).json({status: 'success', result: {code: 0, message: result.stdout }});
+      res.status(200).json({status: 'success', result: {code: 0, message: JSON.parse(result.stdout) }});
     })
     .catch(function (error) {
       console.log(error);
@@ -70,7 +70,7 @@ export function restoreBackground(req, res) {
 }
 
 export function uploadBackground(req, res) {
-  var upload = multer({
+  let upload = multer({
     storage: storage,
     rename: function (fieldname, filename) {
         return filename;
