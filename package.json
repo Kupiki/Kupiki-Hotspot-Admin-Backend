@@ -12,7 +12,9 @@
     "build": "babel src -s -D -d dist --presets env,stage-0",
     "start": "node dist",
     "prestart": "npm run -s build",
-    "test": "eslint src"
+    "test": "eslint src",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -43,17 +45,18 @@
     "express-sequelize-session": "0.4.0",
     "express-session": "^1.11.3",
     "fast-json-patch": "^1.0.0",
-    "jsonwebtoken": "^7.0.0",
+    "jsonwebtoken": "^8.0.0",
     "morgan": "^1.8.0",
     "mysql": "^2.15.0",
     "passport": "~0.3.0",
     "passport-local": "^1.0.0",
     "resource-router-middleware": "^0.6.0",
-    "sequelize": "^3.32.1",
-    "socket.io": "^1.3.5",
-    "socket.io-client": "^1.3.5",
+    "sequelize": "^4.17.2",
+    "socket.io": "2.0.2",
+    "socket.io-client": "2.0.2",
     "socketio-jwt": "^4.2.0",
-    "sqlite3": "^4.0.0"
+    "sqlite3": "^4.0.0",
+    "snyk": "^1.70.3"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
@@ -63,5 +66,6 @@
     "babel-preset-stage-0": "^6.5.0",
     "eslint": "^3.1.1",
     "nodemon": "^1.9.2"
-  }
+  },
+  "snyk": true
 }
