@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
 export default ({ config, dbs }) => {
-  const users = Router();
+  const users = new Router();
   
   function validationError(res, statusCode) {
     statusCode = statusCode || 422;
@@ -23,7 +23,6 @@ export default ({ config, dbs }) => {
         'username',
         'language',
         'email',
-        'role',
         'provider'
       ]
     })

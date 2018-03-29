@@ -25,7 +25,7 @@ export default ({ config, dbs }) => {
       })
   }
   
-  const freeradius = Router();
+  const freeradius = new Router();
   
   freeradius.get('/users', (req, res) => {
     let findUsers = "SELECT userinfo.*, radcheck.value as password, radcheck.attribute FROM userinfo, radcheck WHERE userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'"

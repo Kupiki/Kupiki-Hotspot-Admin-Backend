@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken'
 import authLib from '../middleware/auth'
 
 export default ({ config, dbs }) => {
-  const auth = Router();
+  const auth = new Router();
   let authService = authLib({ config, dbs });
   
   auth.get('/test', authService.isAuthenticated(), (req, res) => {

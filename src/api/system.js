@@ -11,7 +11,7 @@ export function register(socketToRegister) {
 }
 
 export default ({ config, dbs }) => {
-  const system = Router();
+  const system = new Router();
   
   system.get('/upgrade', (req, res) => {
     if (os.platform() === 'linux') {

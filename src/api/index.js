@@ -17,7 +17,7 @@ import portal from './portal.js';
 import freeradius from './freeradius.js';
 
 export default ({ config, dbs }) => {
-	let api = Router();
+	const api = new Router();
   let authService = authLib({ config, dbs });
   
 	api.use('/auth'         , auth({ config, dbs }));
