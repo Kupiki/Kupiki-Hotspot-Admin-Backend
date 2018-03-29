@@ -20,7 +20,10 @@
     "extends": "eslint:recommended",
     "parserOptions": {
       "ecmaVersion": 7,
-      "sourceType": "module"
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "modules": true
+      }
     },
     "env": {
       "node": true
@@ -58,6 +61,7 @@
   "devDependencies": {
     "babel-cli": "^6.9.0",
     "babel-core": "^6.9.0",
+    "babel-eslint": "^8.2.2",
     "babel-preset-env": "^1.6.1",
     "babel-preset-stage-0": "^6.5.0",
     "eslint": "^3.1.1",
