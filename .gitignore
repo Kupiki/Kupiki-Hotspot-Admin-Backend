@@ -1,13 +1,11 @@
 node_modules
-public
 .tmp
-.sass-cache
 .idea
 dist
-server/config/local.env.js
 npm-debug.log
 coverage
 dev.sqlite
-package-lock.json
 dist.sqlite
 deployment-config.json
+package-lock.json
+.editorconfig
