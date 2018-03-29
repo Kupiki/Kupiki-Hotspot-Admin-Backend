@@ -1,6 +1,6 @@
-import { Router } from 'express'
-import jwt from 'jsonwebtoken'
-import authLib from '../middleware/auth'
+import { Router } from 'express';
+import jwt from 'jsonwebtoken';
+import authLib from '../middleware/auth';
 
 export default ({ config, dbs }) => {
   const auth = new Router();
@@ -31,7 +31,7 @@ export default ({ config, dbs }) => {
             const token = jwt.sign({_id: user._id},  config.secret, {
               expiresIn: '24h'
             });
-            return res.status(200).json({ message: 'ok', 'token': token });
+            return res.status(200).json({ message: 'ok', token });
           }
         });
       })

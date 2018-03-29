@@ -65,10 +65,10 @@ export default function(sequelize, DataTypes) {
     hooks: {
       beforeCreate(user) {
         return user.updatePassword(user)
-          .then(hashedPassword => {
+          .then( (hashedPassword) => {
             user.password = hashedPassword;
           })
-          .catch(err => {
+          .catch( (err) => {
             if (err) {
               console.log(err);
               throw new Error(err)
@@ -78,10 +78,10 @@ export default function(sequelize, DataTypes) {
       beforeUpdate(user) {
         if(user.changed('password')) {
           return user.updatePassword(user)
-            .then(hashedPassword => {
+            .then( (hashedPassword) => {
               user.password = hashedPassword;
             })
-            .catch(err => {
+            .catch( (err) => {
               if (err) {
                 console.log(err);
                 throw new Error(err)

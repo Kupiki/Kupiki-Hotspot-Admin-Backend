@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import authLib from '../middleware/auth'
+import authLib from '../middleware/auth';
 
 import auth from './auth.js';
 import users from './users.js';

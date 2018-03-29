@@ -16,12 +16,10 @@ export default ({ config, dbs }) => {
   system.get('/upgrade', (req, res) => {
     if (os.platform() === 'linux') {
       script.execPromise('system check')
-        .then( result => {
+        .then( (result) => {
           res.status(200).json({ status: 'success', code: 0, message: result.stdout.trim() });
         })
-        .catch( err => {
-          console.log('System update error');
-          console.log(err);
+        .catch( (err) => {
           res.status(200).json({ status: 'failed', code: err.code, message: err.stderr });
         });
     } else {
@@ -35,7 +33,7 @@ export default ({ config, dbs }) => {
       reboot.stderr.on('data', (data) => {
         console.log(`reboot stderr: ${data}`);
       });
-      reboot.on('close', code => {
+      reboot.on('close', (code) => {
         if (code !== 0) {
           console.log(`reboot process exited with code ${code}`);
           res.status(500).json({ status: 'failed', code : code, message : 'Reboot process exited abnormaly.<br/>Check server logs.' });

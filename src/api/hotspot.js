@@ -77,17 +77,17 @@ export default ({ config, db }) => resource({
   
   read({ params }, res) {
     if (params.hotspot === 'default') {
-      const configuration = [{"field":"interface","value":"wlan0"},
-        {"field":"driver","value":"nl80211"},
-        {"field":"ssid","value":"pihotspot"},
-        {"field":"hw_mode","value":"g"},
-        {"field":"channel","value":"6"},
-        {"field":"auth_algs","value":"1"},
-        {"field":"beacon_int","value":"100"},
-        {"field":"dtim_period","value":"2"},
-        {"field":"max_num_sta","value":"255"},
-        {"field":"rts_threshold","value":"2347"},
-        {"field":"fragm_threshold","value":"2346"}];
+      const configuration = [{'field':'interface','value':'wlan0'},
+        {'field':'driver','value':'nl80211'},
+        {'field':'ssid','value':'pihotspot'},
+        {'field':'hw_mode','value':'g'},
+        {'field':'channel','value':'6'},
+        {'field':'auth_algs','value':'1'},
+        {'field':'beacon_int','value':'100'},
+        {'field':'dtim_period','value':'2'},
+        {'field':'max_num_sta','value':'255'},
+        {'field':'rts_threshold','value':'2347'},
+        {'field':'fragm_threshold','value':'2346'}];
   
       res.status(200).json({status: 'success', code: 0, message: configuration });
     }
