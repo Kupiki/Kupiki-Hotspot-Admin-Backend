@@ -1,0 +1,33 @@
+{
+	"port": 4000,
+	"bodyLimit": "100kb",
+	"secret": "kupiki-hotspot-admin-secret",
+	"corsHeaders": ["Link"],
+	"sequelize": {
+		"localDb": {
+			"uri": "sqlite://",
+			"options": {
+				"logging": false,
+				"storage": "kupiki.sqlite",
+				"define": {
+					"timestamps": false
+				}
+			}
+		},
+		"freeradius": {
+			"username": "root",
+			"password": "raspbian",
+			"database": "radius",
+			"host": "127.0.0.1",
+			"dialect": "mariadb",
+			"insecureAuth" : true
+		}
+	},
+	"client": {
+		"host": "192.168.10.160",
+		"port": "3000"
+	},
+	"seedDB": true,
+    "servicesFilters": ["chilli", "freeradius", "nginx", "hostapd", "mysql"],
+    "httpSudoTimeout": 10000
+}

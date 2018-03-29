@@ -1,12 +1,49 @@
-'use strict';
+import http from 'http';
+import express from 'express';
+import cors from 'cors';
+import morgan from 'morgan';
+import bodyParser from 'body-parser';
+import initializeDb from './db';
+import middleware from './middleware';
+import api from './api';
+import config from './config.json';
+import passport from 'passport';
 
-// Set default node environment to development
-var env = process.env.NODE_ENV = process.env.NODE_ENV || 'development';
+let app = express();
+app.server = http.createServer(app);
 
-if(env === 'development' || env === 'test') {
-  // Register the Babel require hook
-  require('babel-register');
-}
+// logger
+app.use(morgan('dev'));
 
-// Export the application
-exports = module.exports = require('./app');
+// 3rd party middleware
+app.use(cors({
+	credentials: true,
+	origin: 'http://'+config.client.host+':'+config.client.port
+}));
+
+let socketio = require('socket.io')(app.server, {
+  serveClient: true
+});
+require('./lib/socketio').default(socketio);
+
+app.use(bodyParser.json({
+	limit : config.bodyLimit
+}));
+
+app.use(passport.initialize({ session: false }));
+
+// connect to db
+initializeDb( dbs => {
+
+	// internal middleware
+	app.use(middleware({ config, dbs }));
+
+	// api router
+	app.use('/api', api({ config, dbs }));
+
+	app.server.listen(process.env.PORT || config.port, () => {
+		console.log(`Started on port ${app.server.address().port}`);
+	});
+});
+
+export default app;
