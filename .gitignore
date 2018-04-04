@@ -9,3 +9,4 @@ dist.sqlite
 deployment-config.json
 package-lock.json
 .editorconfig
+.vscode/

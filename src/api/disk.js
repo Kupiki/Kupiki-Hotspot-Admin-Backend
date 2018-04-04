@@ -46,7 +46,7 @@ export default ({ config, db }) => resource({
                 }
               }
             });
-            disk.chartData = JSON.stringify(disk.chartData)
+            disk.chartData = JSON.stringify(disk.chartData);
             res.status(200).json(disk);
           })
           .catch(() => {

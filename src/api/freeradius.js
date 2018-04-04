@@ -28,7 +28,7 @@ export default ({ config, dbs }) => {
   const freeradius = new Router();
   
   freeradius.get('/users', (req, res) => {
-    let findUsers = "SELECT userinfo.*, radcheck.value as password, radcheck.attribute FROM userinfo, radcheck WHERE userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'"
+    let findUsers = "SELECT userinfo.*, radcheck.value as password, radcheck.attribute FROM userinfo, radcheck WHERE userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'";
     dbs.freeradius.sequelize.query(findUsers, { type: Sequelize.QueryTypes.SELECT })
       .then(users => {
         res.status(200).json({status: 'success', code: 0, message: users });

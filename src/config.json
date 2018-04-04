@@ -1,6 +1,6 @@
 {
 	"port": 4000,
-	"bodyLimit": "100kb",
+	"bodyLimit": "200kb",
 	"secret": "kupiki-hotspot-admin-secret",
 	"corsHeaders": ["Link"],
 	"sequelize": {
@@ -20,7 +20,8 @@
 			"database": "radius",
 			"host": "127.0.0.1",
 			"dialect": "mysql",
-			"insecureAuth" : true
+			"insecureAuth" : true,
+      		"operatorsAliases": false
 		}
 	},
 	"client": {
