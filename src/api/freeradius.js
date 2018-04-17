@@ -2,6 +2,8 @@ import { Router } from 'express'
 import Sequelize from 'sequelize';
 import async from 'async';
 
+const Op = Sequelize.Op;
+
 export default ({ config, dbs }) => {
   function handleError(res, statusCode) {
     statusCode = statusCode || 500;
@@ -26,10 +28,81 @@ export default ({ config, dbs }) => {
   }
   
   const freeradius = new Router();
-  
+
+	const sqlRequests = {
+		"allUsers" : {
+			"sqlFind" : `
+			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status 
+			FROM userinfo 
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
+			LEFT JOIN radcheck ON userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password' 
+			GROUP BY userinfo.username
+			`,
+		"sqlFindNoPassword" : `
+			SELECT userinfo.*, count(radacct.username) as status 
+			FROM userinfo 
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
+			GROUP BY userinfo.username
+			`,
+		"sqlFindStatistics" : `
+			select username, count(acctsessionid) as totalSessions, sum(acctinputoctets) as totalInputOctets, sum(acctoutputoctets) as totalOutputOctets, max(acctupdatetime) as lastSeen
+			from radacct
+			group by radacct.username
+			`,
+		"sqlFindSessionsPerDay" : `
+			select date(radacct.acctstarttime) as startDay, count(radacct.username) as countSessions
+			from radacct
+			group by startDay
+			order by startDay asc
+			`,
+		"sqlFindOctetsPerDay" : `
+			select date(radacct.acctstarttime) as startDay, sum(radacct.acctinputoctets) as totalInputOctets, sum(radacct.acctoutputoctets) as totalOutputOctets
+			from radacct
+			group by startDay
+			order by startDay asc
+			`
+		},
+		"oneUser" : {
+			"sqlFind" : `
+			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status 
+			FROM userinfo 
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
+			LEFT JOIN radcheck ON userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password' 
+			WHERE userinfo.username = :username
+			GROUP BY userinfo.username
+			`,
+		"sqlFindNoPassword" : `
+			SELECT userinfo.*, count(radacct.username) as status 
+			FROM userinfo 
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
+			WHERE userinfo.username = :username
+			GROUP BY userinfo.username
+			`,
+		"sqlFindStatistics" : `
+			SELECT username, count(acctsessionid) as totalSessions, sum(acctinputoctets) as totalInputOctets, sum(acctoutputoctets) as totalOutputOctets, max(acctupdatetime) as lastSeen
+			FROM radacct
+			WHERE radacct.username = :username
+			GROUP BY radacct.username
+			`,
+		"sqlFindSessionsPerDay" : `
+			SELECT date(radacct.acctstarttime) as startDay, count(radacct.username) as countSessions
+			FROM radacct
+			WHERE radacct.username = :username
+			GROUP BY startDay
+			ORDER BY startDay ASC
+			`,
+		"sqlFindOctetsPerDay" : `
+			SELECT date(radacct.acctstarttime) as startDay, sum(radacct.acctinputoctets) as totalInputOctets, sum(radacct.acctoutputoctets) as totalOutputOctets
+			FROM radacct
+			WHERE radacct.username = :username
+			GROUP BY startDay
+			ORDER BY startDay ASC
+			`
+		}
+	};
+
   freeradius.get('/users', (req, res) => {
-    let findUsers = "SELECT userinfo.*, radcheck.value as password, radcheck.attribute FROM userinfo, radcheck WHERE userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'";
-    dbs.freeradius.sequelize.query(findUsers, { type: Sequelize.QueryTypes.SELECT })
+    dbs.freeradius.sequelize.query(sqlRequests.allUsers.sqlFind, { type: Sequelize.QueryTypes.SELECT })
       .then(users => {
         res.status(200).json({status: 'success', code: 0, message: users });
       })
@@ -151,6 +224,56 @@ export default ({ config, dbs }) => {
       .catch( () => {
         res.status(200).json({ status: 'failed', code : 500, message : 'Error while saving data' });
       });
+  });
+	
+	freeradius.get('/statistics/:user?', (req, res) => {
+		let answer = {};
+		let asyncs = [];
+		let sqlSource = (req.params.user) ? sqlRequests.oneUser : sqlRequests.allUsers;
+
+		asyncs.push( callback => {
+			dbs.freeradius.sequelize.query(sqlSource.sqlFindOctetsPerDay, { replacements: { username: req.params.user }, type: Sequelize.QueryTypes.SELECT })
+			.then(data => {
+				answer.octets = data;
+				callback();
+			})
+			.catch(handleError(res));
+		});
+
+		asyncs.push( callback => {
+			dbs.freeradius.sequelize.query(sqlSource.sqlFindNoPassword, { replacements: { username: req.params.user }, type: Sequelize.QueryTypes.SELECT })
+			.then(data => {
+				answer.users = data;
+				callback();
+			})
+			.catch(handleError(res));
+		});
+	
+		asyncs.push( callback => {
+			dbs.freeradius.sequelize.query(sqlSource.sqlFindStatistics, { replacements: { username: req.params.user }, type: Sequelize.QueryTypes.SELECT })
+			.then(data => {
+				answer.statisticsPerUser = data;
+				callback();
+			})
+			.catch(handleError(res));
+		});
+
+		asyncs.push( callback => {
+			dbs.freeradius.sequelize.query(sqlSource.sqlFindSessionsPerDay, { replacements: { username: req.params.user }, type: Sequelize.QueryTypes.SELECT })
+			.then(data => {
+				answer.sessionsPerDay = data;
+				callback();
+			})
+			.catch(handleError(res));
+		});
+
+		async.series( asyncs, err => {
+			if (!err) {
+				res.status(200).json({ status: 'success', code : 0, message : answer });
+			} else {
+				res.status(200).json({ status: 'failed', code : 500, message : 'Unable to update attributes' });
+			}
+		});
   });
   
   return freeradius

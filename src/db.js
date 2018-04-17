@@ -1,6 +1,8 @@
 import config from './config.json';
 import Sequelize from 'sequelize';
 
+const Op = Sequelize.Op;
+
 export default callback => {
 	let dbs = {};
 	
@@ -20,7 +22,9 @@ export default callback => {
   dbs.localDb.User = dbs.localDb.sequelize.import('./models/localDb/User.js');
   dbs.localDb.User.findOrCreate({
 		where: {
-			username: 'admin'
+			username: {
+				[Op.eq] : 'admin'
+			}
 		},
 		defaults: {
 			provider: 'local',

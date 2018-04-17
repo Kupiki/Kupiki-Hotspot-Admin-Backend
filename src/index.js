@@ -15,10 +15,13 @@ app.server = http.createServer(app);
 // logger
 app.use(morgan('dev'));
 
+let corsServer = 'http://'+config.client.host
+corsServer+= (config.client.port !== '80' && config.client.port !== '')?':'+config.client.port:'';
+
 // 3rd party middleware
 app.use(cors({
 	credentials: true,
-	origin: 'http://'+config.client.host+':'+config.client.port
+	origin: corsServer
 }));
 
 let socketio = require('socket.io')(app.server, {
