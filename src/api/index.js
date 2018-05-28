@@ -15,6 +15,7 @@ import system from './system.js';
 import hotspot from './hotspot.js';
 import portal from './portal.js';
 import freeradius from './freeradius.js';
+import coova from './coova.js';
 
 export default ({ config, dbs }) => {
 	const api = new Router();
@@ -34,6 +35,7 @@ export default ({ config, dbs }) => {
   api.use('/hotspot'      , authService.isAuthenticated(), hotspot({ config, dbs }));
   api.use('/portal'       , authService.isAuthenticated(), portal({ config, dbs }));
   api.use('/freeradius'   , authService.isAuthenticated(), freeradius({ config, dbs }));
+  api.use('/coova'        , authService.isAuthenticated(), coova({ config, dbs }));
   
   return api;
 }

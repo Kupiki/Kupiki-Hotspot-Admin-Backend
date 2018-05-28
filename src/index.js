@@ -15,10 +15,10 @@ app.server = http.createServer(app);
 // logger
 app.use(morgan('dev'));
 
-let corsServer = 'http://'+config.client.host
-corsServer+= (config.client.port !== '80' && config.client.port !== '')?':'+config.client.port:'';
-
 // 3rd party middleware
+let corsServer = 'http://'+ (process.env.CLIENT_HOST || config.client.host)
+const clientPort = (process.env.CLIENT_PORT || config.client.port)
+corsServer+= (clientPort !== '80' && clientPort !== '')?':'+clientPort:'';
 app.use(cors({
 	credentials: true,
 	origin: corsServer

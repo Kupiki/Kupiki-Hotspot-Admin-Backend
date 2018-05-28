@@ -1,14 +1,14 @@
 import { Router } from 'express';
 import jwt from 'jsonwebtoken';
-import authLib from '../middleware/auth';
+// import authLib from '../middleware/auth';
 
 export default ({ config, dbs }) => {
   const auth = new Router();
-  let authService = authLib({ config, dbs });
-  
-  auth.get('/test', authService.isAuthenticated(), (req, res) => {
-    res.status(200).json({ message: 'Hello sweetie', auth: req.isAuthenticated() })
-  });
+
+  // let authService = authLib({ config, dbs });
+  // auth.get('/test', authService.isAuthenticated(), (req, res) => {
+  //   res.status(200).json({ message: 'Hello sweetie', auth: req.isAuthenticated() })
+  // });
   
   auth.post('/login', (req, res) => {
     if (!req.body.username || !req.body.password) {

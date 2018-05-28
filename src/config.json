@@ -8,7 +8,7 @@
 			"uri": "sqlite://",
 			"options": {
 				"logging": false,
-				"storage": "kupiki.sqlite",
+				"storage": "/var/local/kupiki/kupiki.sqlite",
 				"define": {
 					"timestamps": false
 				}
@@ -16,12 +16,12 @@
 		},
 		"freeradius": {
 			"username": "root",
-			"password": "raspbian",
+			"password": "pihotspot",
 			"database": "radius",
 			"host": "127.0.0.1",
 			"dialect": "mysql",
 			"insecureAuth" : true,
-      		"operatorsAliases": false
+      "operatorsAliases": false
 		}
 	},
 	"client": {

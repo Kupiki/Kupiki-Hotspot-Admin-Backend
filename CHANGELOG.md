@@ -1,3 +1,7 @@
+**v2.2**
+- Review of API returns to standardize them
+- Bugs fixing
+
 **v2.1**
 - Update corsURL calculation for production server with port 80
 - Correct different API entries

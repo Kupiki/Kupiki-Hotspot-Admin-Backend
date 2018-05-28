@@ -17,7 +17,8 @@ export default ({ config, db }) => resource({
       { 'name': 'plateform', 'value': os.platform() },
       { 'name': 'release', 'value': os.release() }
     ];
-    res.status(200).json({information});
+    res.status(200).json({ status: 'success', code : 0, message : information });
+  
   }
   
 });

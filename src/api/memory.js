@@ -38,10 +38,10 @@ export default ({ config, db }) => resource({
           }
         });
         memory.chartData = JSON.stringify(memory.chartData);
-        res.status(200).json(memory);
+        res.status(200).json({ status: 'success', code : 0, message : memory });
       })
       .catch( () => {
-        res.status(200).json(memory);
+        res.status(500).json({ status: 'failed', code : 500, message : memory });
       })
   }
   

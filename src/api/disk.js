@@ -1,7 +1,8 @@
-const diskspace = require('diskspace');
 import * as script from '../lib/system.service.js';
 import resource from 'resource-router-middleware';
 import { formatBytes } from '../lib/util.js';
+
+const diskspace = require('diskspace');
 
 export default ({ config, db }) => resource({
   
@@ -47,10 +48,10 @@ export default ({ config, db }) => resource({
               }
             });
             disk.chartData = JSON.stringify(disk.chartData);
-            res.status(200).json(disk);
+            res.status(200).json({ status: 'success', code : 0, message : disk });
           })
           .catch(() => {
-            res.status(500).json(disk);
+            res.status(500).json({ status: 'failed', code : 500, message : disk });
           })
       }
     });

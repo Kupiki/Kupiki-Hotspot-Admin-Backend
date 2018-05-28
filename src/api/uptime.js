@@ -9,7 +9,8 @@ export default ({ config, db }) => resource({
   
   /** GET / - List all entities */
   index({ params }, res) {
-    res.status(200).json({'uptime': os.uptime()});
+    res.status(200).json({ status: 'success', code : 0, message : {'uptime': os.uptime()} });
+    // res.status(200).json({'uptime': os.uptime()});
   }
   
 });

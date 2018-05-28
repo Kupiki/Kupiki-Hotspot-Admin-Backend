@@ -28,10 +28,10 @@ export default ({ config, db }) => resource({
           }
         });
         cpu.chartData = JSON.stringify(cpu.chartData);
-        res.status(200).json(cpu);
+        res.status(200).json({ status: 'success', code : 0, message : cpu });
       })
       .catch(() => {
-        res.status(200).json(cpu);
+        res.status(500).json({ status: 'failed', code : 500, message : cpu });
       })
   }
   

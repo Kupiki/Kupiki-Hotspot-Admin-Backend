@@ -1,14 +1,16 @@
 import { Router } from 'express'
 import Sequelize from 'sequelize';
 import async from 'async';
+import * as script from '../lib/system.service.js';
 
-const Op = Sequelize.Op;
+// const Op = Sequelize.Op;
 
 export default ({ config, dbs }) => {
   function handleError(res, statusCode) {
     statusCode = statusCode || 500;
     return function(err) {
-      return res.status(statusCode).send(err);
+      return res.status(200).json({status: 'failed', code: statusCode, message: err });
+      // return res.status(statusCode).send(err);
     };
   }
   
@@ -32,16 +34,16 @@ export default ({ config, dbs }) => {
 	const sqlRequests = {
 		"allUsers" : {
 			"sqlFind" : `
-			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status 
-			FROM userinfo 
-			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
-			LEFT JOIN radcheck ON userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password' 
+			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status
+			FROM userinfo
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null
+			LEFT JOIN radcheck ON userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'
 			GROUP BY userinfo.username
 			`,
 		"sqlFindNoPassword" : `
-			SELECT userinfo.*, count(radacct.username) as status 
-			FROM userinfo 
-			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
+			SELECT userinfo.*, count(radacct.username) as status
+			FROM userinfo
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null
 			GROUP BY userinfo.username
 			`,
 		"sqlFindStatistics" : `
@@ -64,17 +66,17 @@ export default ({ config, dbs }) => {
 		},
 		"oneUser" : {
 			"sqlFind" : `
-			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status 
-			FROM userinfo 
-			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
-			LEFT JOIN radcheck ON userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password' 
+			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status
+			FROM userinfo
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null
+			LEFT JOIN radcheck ON userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'
 			WHERE userinfo.username = :username
 			GROUP BY userinfo.username
 			`,
 		"sqlFindNoPassword" : `
-			SELECT userinfo.*, count(radacct.username) as status 
-			FROM userinfo 
-			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null 
+			SELECT userinfo.*, count(radacct.username) as status
+			FROM userinfo
+			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null
 			WHERE userinfo.username = :username
 			GROUP BY userinfo.username
 			`,
@@ -162,7 +164,6 @@ export default ({ config, dbs }) => {
           if (!err) {
             res.status(200).json({ status: 'success', code : 0, message : '' });
           } else {
-            // console.log(err);
             res.status(200).json({ status: 'failed', code : 500, message : 'Unable to update attributes' });
           }
         });
@@ -225,8 +226,55 @@ export default ({ config, dbs }) => {
         res.status(200).json({ status: 'failed', code : 500, message : 'Error while saving data' });
       });
   });
-	
-	freeradius.get('/statistics/:user?', (req, res) => {
+  
+  freeradius.post('/disconnect/', (req, res) => {
+    script.execPromise('freeradius disconnect '+req.body.user)
+      .then( result => {
+        res.status(200).json({status: 'success', code: 0, message: JSON.parse(result.stdout) });
+      })
+      .catch( error => {
+        console.log(error);
+        res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
+      });
+  });
+  
+  freeradius.get('/check/:user', (req, res) => {
+    let asyncs = [];
+    let answer = {};
+
+    let sqlSource = sqlRequests.oneUser;
+    asyncs.push( callback => {
+      dbs.freeradius.sequelize.query(sqlSource.sqlFind, { replacements: { username: req.params.user }, type: Sequelize.QueryTypes.SELECT })
+        .then(data => {
+          answer = data;
+          callback();
+        })
+        .catch(handleError(res));
+    });
+
+    asyncs.push( callback => {
+      if (Array.isArray(answer) && answer.length === 1) {
+        let command = 'freeradius check ' + req.params.user + ' ' + answer[0].password;
+        script.execPromise(command)
+          .then(() => {
+            callback();
+          })
+          .catch(handleError(res, 200));
+      } else {
+        handleError(res, 200)
+      }
+    });
+
+    async.series( asyncs, err => {
+      if (!err) {
+        res.status(200).json({ status: 'success', code : 0, message : '' });
+      } else {
+        res.status(200).json({ status: 'failed', code : 500, message : 'Unable to update attributes' });
+      }
+    });
+  });
+  
+  freeradius.get('/statistics/:user?', (req, res) => {
 		let answer = {};
 		let asyncs = [];
 		let sqlSource = (req.params.user) ? sqlRequests.oneUser : sqlRequests.allUsers;
