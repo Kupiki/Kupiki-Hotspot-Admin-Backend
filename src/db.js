@@ -1,4 +1,6 @@
 import config from './config.json';
+// import freeradius_dictionary from './models/data/freeradius_dictionary';
+import sql from './models/data/freeradius_dictionary'
 import Sequelize from 'sequelize';
 
 const Op = Sequelize.Op;
@@ -14,7 +16,16 @@ export default callback => {
   dbs.freeradius.radreply = dbs.freeradius.sequelize.import('./models/freeradius/radreply.js');
   dbs.freeradius.radcheck = dbs.freeradius.sequelize.import('./models/freeradius/radcheck.js');
   dbs.freeradius.radacct = dbs.freeradius.sequelize.import('./models/freeradius/radacct.js');
-  
+  dbs.freeradius.dictionary = dbs.freeradius.sequelize.import('./models/freeradius/dictionary.js')
+
+  dbs.freeradius.dictionary.count().then( attributes => {
+    if (attributes === 0) {
+      sql.sqlRequests.forEach( sqlRequest => {
+        dbs.freeradius.sequelize.query(sqlRequest).then(results => {})
+      })
+    }
+  });
+
   dbs.localDb = {
     Sequelize,
     sequelize: new Sequelize(config.sequelize.localDb.uri, config.sequelize.localDb.options)

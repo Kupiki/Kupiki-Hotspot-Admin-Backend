@@ -1,16 +1,17 @@
-import { Router } from 'express'
-import Sequelize from 'sequelize';
+import { Router } from 'express';
+import Sequelize from 'sequelize'; 
 import async from 'async';
 import * as script from '../lib/system.service.js';
 
-// const Op = Sequelize.Op;
+const Op = Sequelize.Op;
+
+const Dictionaries = ['dictionary.rfc2865', 'dictionary.freeradius.internal', 'dictionary.daloradius'];
 
 export default ({ config, dbs }) => {
   function handleError(res, statusCode) {
     statusCode = statusCode || 500;
     return function(err) {
       return res.status(200).json({status: 'failed', code: statusCode, message: err });
-      // return res.status(statusCode).send(err);
     };
   }
   
@@ -19,11 +20,9 @@ export default ({ config, dbs }) => {
       .findOne({ where: condition })
       .then( obj => {
         if(obj) { // update
-          // console.log(obj);
           return obj.update(values);
         }
         else { // insert
-          // console.log(values)
           return model.create(values);
         }
       })
@@ -34,10 +33,12 @@ export default ({ config, dbs }) => {
 	const sqlRequests = {
 		"allUsers" : {
 			"sqlFind" : `
-			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status
+			SELECT userinfo.*, radcheck.value as password, radcheck.attribute, count(radacct.username) as status, rc.countRadcheck, rr.countRadreply
 			FROM userinfo
 			LEFT JOIN radacct ON radacct.username = userinfo.username AND radacct.acctstoptime is null
 			LEFT JOIN radcheck ON userinfo.username = radcheck.username AND radcheck.attribute LIKE '%-Password'
+			LEFT JOIN (SELECT COUNT(radcheck.id) as countRadcheck, username FROM radcheck) rc ON userinfo.username = rc.username
+			LEFT JOIN (SELECT COUNT(radreply.id) as countRadreply, username FROM radreply) rr ON userinfo.username = rr.username
 			GROUP BY userinfo.username
 			`,
 		"sqlFindNoPassword" : `
@@ -132,20 +133,39 @@ export default ({ config, dbs }) => {
     });
   });
   
-  freeradius.get('/radcheck', (req, res) => {
+  freeradius.get('/dictionary/:attributesType', (req, res) => {
+    return dbs.freeradius.dictionary.findAll({
+      where: {
+        Vendor: {
+          [Op.or] : Dictionaries
+        },
+        RecommendedTable: {
+          [Op.or] : [null, req.params.attributesType.substring(3)]
+        }
+      },
+      order: [
+        ['Attribute', 'ASC']
+      ],
+      attributes: { exclude : ['createdAt', 'updatedAt'] }
+    }).then(dictionaryAttributes => {
+      res.status(200).json({ status: 'success', code : 0, message : dictionaryAttributes });
+    }).catch(handleError(res));
+  });
+  
+  freeradius.get('/radcheck/:username', (req, res) => {
     return dbs.freeradius.radcheck.findAll({
       where: {
-        username: req.query.username
+        username: req.params.username
       },
-      attributes: { exclude : ['createdAt', 'updatedAt'] }
+      attributes: { exclude : ['id', 'username', 'createdAt', 'updatedAt'] }
     }).then(userCheckAttributes => {
-      res.status(200).json(userCheckAttributes);
+      res.status(200).json({ status: 'success', code : 0, message : userCheckAttributes });
     }).catch(handleError(res));
   });
   
   freeradius.post('/radcheck', (req, res) => {
     let attributes = [];
-    (Array.isArray(req.body.radcheck))?attributes = req.body.radcheck:attributes.push(req.body.radcheck);
+    (Array.isArray(req.body.attributes))?attributes = req.body.attributes:attributes.push(req.body.attributes);
     if ( req.body.username ) {
       let asyncs = [];
       dbs.freeradius.radcheck.destroy({
@@ -155,7 +175,7 @@ export default ({ config, dbs }) => {
       }).then( () => {
         attributes.forEach( attribute => {
           asyncs.push( callback => {
-            dbs.freeradius.radcheck.create({username: attribute.username, attribute: attribute.attribute, op: attribute.op, value: attribute.value }).then( () => {
+            dbs.freeradius.radcheck.create({username: req.body.username, attribute: attribute.attribute, op: attribute.op, value: attribute.value }).then( () => {
               callback();
             });
           });
@@ -164,7 +184,7 @@ export default ({ config, dbs }) => {
           if (!err) {
             res.status(200).json({ status: 'success', code : 0, message : '' });
           } else {
-            res.status(200).json({ status: 'failed', code : 500, message : 'Unable to update attributes' });
+            res.status(200).json({ status: 'failed', code : 500, message : 'Unable to update radcheck attributes' });
           }
         });
       });
@@ -173,15 +193,52 @@ export default ({ config, dbs }) => {
     }
   });
   
-  freeradius.get('/radreply', (req, res) => {
+  freeradius.get('/radreply/:username', (req, res) => {
     return dbs.freeradius.radreply.findAll({
       where: {
-        username: req.query.username
+        username: req.params.username
       },
-      attributes: { exclude : ['createdAt', 'updatedAt'] }
+      attributes: { exclude : ['id', 'username', 'createdAt', 'updatedAt'] }
     }).then( userReplyAttributes => {
-      res.status(200).json(userReplyAttributes);
+      res.status(200).json({ status: 'success', code : 0, message : userReplyAttributes });
     }).catch(handleError(res));
+  });
+  
+  freeradius.post('/radreply', (req, res) => {
+    let attributes = [];
+    (Array.isArray(req.body.attributes))?attributes = req.body.attributes:attributes.push(req.body.attributes);
+    if ( req.body.username ) {
+      let asyncs = [];
+      dbs.freeradius.radreply.destroy({
+        where: {
+          username: req.body.username
+        }
+      }).then( () => {
+        attributes.forEach( attribute => {
+          if (attribute) {
+            asyncs.push(callback => {
+              dbs.freeradius.radreply.create({
+                username: req.body.username,
+                attribute: attribute.attribute,
+                op: attribute.op,
+                value: attribute.value
+              }).then(() => {
+                callback();
+              });
+            });
+          }
+        });
+        async.series( asyncs, err => {
+          if (!err) {
+            res.status(200).json({ status: 'success', code : 0, message : '' });
+          } else {
+            res.status(200).json({ status: 'failed', code : 500, message : 'Unable to update radcheck attributes' });
+          }
+        });
+      });
+    } else {
+      res.status(200).json({ status: 'failed', code : 500, message : 'Attributes is not array' });
+    }
   });
   
   freeradius.get('/userinfo', (req, res) => {

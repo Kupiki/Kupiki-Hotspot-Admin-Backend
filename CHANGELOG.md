@@ -1,3 +1,8 @@
+**v2.3**
+- Add API for freeradius attributes management
+- Add API for freeradius dictionaries management
+- Bugs fixing
+
 **v2.2**
 - Review of API returns to standardize them
 - Bugs fixing
