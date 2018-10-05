@@ -165,7 +165,11 @@ export default ({ config, dbs }) => {
   
   freeradius.post('/radcheck', (req, res) => {
     let attributes = [];
-    (Array.isArray(req.body.attributes))?attributes = req.body.attributes:attributes.push(req.body.attributes);
+		(Array.isArray(req.body.attributes))?attributes = req.body.attributes:attributes.push(req.body.attributes);
+		
+		console.log(req.body)
+		console.log(attributes)
+
     if ( req.body.username ) {
       let asyncs = [];
       dbs.freeradius.radcheck.destroy({
@@ -311,7 +315,8 @@ export default ({ config, dbs }) => {
 
     asyncs.push( callback => {
       if (Array.isArray(answer) && answer.length === 1) {
-        let command = 'freeradius check ' + req.params.user + ' ' + answer[0].password;
+				let command = 'freeradius check ' + req.params.user + ' ' + answer[0].password;
+				console.log(command)
         script.execPromise(command)
           .then(() => {
             callback();

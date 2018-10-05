@@ -3,25 +3,25 @@
 export default function(sequelize, DataTypes) {
   const radcheck = sequelize.define('radcheck', {
     id: {
-      type: DataTypes.INTEGER,
+      type: new DataTypes.INTEGER(),
       allowNull: false,
       primaryKey: true,
       autoIncrement: true
     },
     username: {
-      type: DataTypes.STRING,
+      type: new DataTypes.STRING(),
       allowNull: false
     },
     attribute: {
-      type: DataTypes.STRING,
+      type: new DataTypes.STRING(),
       allowNull: false
     },
     op: {
-      type: DataTypes.CHAR(2),
+      type: new DataTypes.CHAR(2),
       allowNull: false
     },
     value: {
-      type: DataTypes.STRING,
+      type: new DataTypes.STRING(),
       allowNull: false
     }
   }, {

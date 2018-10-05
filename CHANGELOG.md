@@ -1,3 +1,7 @@
+**v2.4**
+- Update freeradius models
+- Add dictionary for attributes check
+
 **v2.3**
 - Add API for freeradius attributes management
 - Add API for freeradius dictionaries management
