@@ -14,7 +14,8 @@
     "prestart": "npm run -s build",
     "test": "eslint src",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepublish": "npm run snyk-protect",
+    "prepare": "npm run snyk-protect"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -57,7 +58,7 @@
     "socket.io-client": "2.0.2",
     "socketio-jwt": "^4.2.0",
     "sqlite3": "^4.0.0",
-    "snyk": "^1.70.3"
+    "snyk": "^1.108.0"
   },
   "devDependencies": {
     "babel-cli": "^6.9.0",
