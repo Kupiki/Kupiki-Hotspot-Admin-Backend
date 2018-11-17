@@ -1,3 +1,6 @@
+**v2.4.1**
+- Update of the gitignore file
+
 **v2.4**
 - Update freeradius models
 - Add dictionary for attributes check

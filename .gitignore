@@ -10,3 +10,4 @@ deployment-config.json
 package-lock.json
 .editorconfig
 .vscode/
+.DS_Store
