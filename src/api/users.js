@@ -2,17 +2,17 @@ import { Router } from 'express'
 
 export default ({ config, dbs }) => {
   const users = new Router();
-  
+
   function validationError(res, statusCode) {
     statusCode = statusCode || 422;
     return (err) => {
       return res.status(statusCode).json(err);
     };
   }
-  
+
   users.get('/me', (req, res, next) => {
     const userId = req.user._id;
-  
+
     return dbs.localDb.User.find({
       where: {
         _id: userId
@@ -34,12 +34,12 @@ export default ({ config, dbs }) => {
       })
       .catch(err => next(err));
   });
-  
+
   users.put('/:id/password', (req, res) => {
     const userId = req.user._id;
     const oldPass = String(req.body.oldPassword);
     const newPass = String(req.body.newPassword);
-  
+
     return dbs.localDb.User.find({
       where: {
         _id: userId
@@ -58,10 +58,10 @@ export default ({ config, dbs }) => {
         }
       });
   });
-  
+
   users.post('/language', (req, res, next) => {
     const userId = req.user._id;
-  
+
     dbs.localDb.User.findOne({
       where: {
         _id: userId
@@ -79,7 +79,7 @@ export default ({ config, dbs }) => {
       })
       .catch(err => next(err));
   });
-  
+
   return users;
 };
 

@@ -3,7 +3,7 @@ import * as script from '../lib/system.service.js';
 
 export default ({ config, dbs }) => {
   const coova = new Router();
-  
+
   coova.get('/macauth', (req, res) => {
     script.execPromise('coova getMacAuth')
       .then( result => {
@@ -14,9 +14,8 @@ export default ({ config, dbs }) => {
         res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
       });
   });
-  
+
   coova.put('/macauth', (req, res) => {
-    console.log(req.body);
     if (req.body.configuration) {
       script.execPromise('coova setMacAuth ' + req.body.configuration.active + ' ' + req.body.configuration.password)
         .then(result => {

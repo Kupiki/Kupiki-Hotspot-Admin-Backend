@@ -5,11 +5,6 @@ import jwt from 'jsonwebtoken';
 export default ({ config, dbs }) => {
   const auth = new Router();
 
-  // let authService = authLib({ config, dbs });
-  // auth.get('/test', authService.isAuthenticated(), (req, res) => {
-  //   res.status(200).json({ message: 'Hello sweetie', auth: req.isAuthenticated() })
-  // });
-  
   auth.post('/login', (req, res) => {
     if (!req.body.username || !req.body.password) {
       return res.status(400).json({ message: 'Missing required fields' });
@@ -39,7 +34,7 @@ export default ({ config, dbs }) => {
         return res.status(400).json(err)
       })
   });
-  
+
   return auth;
 };
 

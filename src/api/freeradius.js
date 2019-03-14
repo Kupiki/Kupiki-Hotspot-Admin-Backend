@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import Sequelize from 'sequelize'; 
+import Sequelize from 'sequelize';
 import async from 'async';
 import * as script from '../lib/system.service.js';
 
@@ -14,7 +14,7 @@ export default ({ config, dbs }) => {
       return res.status(200).json({status: 'failed', code: statusCode, message: err });
     };
   }
-  
+
   function upsert(model, condition, values) {
     return model
       .findOne({ where: condition })
@@ -27,7 +27,7 @@ export default ({ config, dbs }) => {
         }
       })
   }
-  
+
   const freeradius = new Router();
 
 	const sqlRequests = {
@@ -111,7 +111,7 @@ export default ({ config, dbs }) => {
       })
       .catch(handleError(res));
   });
-  
+
   freeradius.delete('/:username', (req, res) => {
     let asyncs = [];
     asyncs.push( callback => {
@@ -132,7 +132,7 @@ export default ({ config, dbs }) => {
       }
     });
   });
-  
+
   freeradius.get('/dictionary/:attributesType', (req, res) => {
     return dbs.freeradius.dictionary.findAll({
       where: {
@@ -151,7 +151,7 @@ export default ({ config, dbs }) => {
       res.status(200).json({ status: 'success', code : 0, message : dictionaryAttributes });
     }).catch(handleError(res));
   });
-  
+
   freeradius.get('/radcheck/:username', (req, res) => {
     return dbs.freeradius.radcheck.findAll({
       where: {
@@ -162,11 +162,11 @@ export default ({ config, dbs }) => {
       res.status(200).json({ status: 'success', code : 0, message : userCheckAttributes });
     }).catch(handleError(res));
   });
-  
+
   freeradius.post('/radcheck', (req, res) => {
     let attributes = [];
 		(Array.isArray(req.body.attributes))?attributes = req.body.attributes:attributes.push(req.body.attributes);
-		
+
 		console.log(req.body)
 		console.log(attributes)
 
@@ -196,7 +196,7 @@ export default ({ config, dbs }) => {
       res.status(200).json({ status: 'failed', code : 500, message : 'Attributes is not array' });
     }
   });
-  
+
   freeradius.get('/radreply/:username', (req, res) => {
     return dbs.freeradius.radreply.findAll({
       where: {
@@ -207,7 +207,7 @@ export default ({ config, dbs }) => {
       res.status(200).json({ status: 'success', code : 0, message : userReplyAttributes });
     }).catch(handleError(res));
   });
-  
+
   freeradius.post('/radreply', (req, res) => {
     let attributes = [];
     (Array.isArray(req.body.attributes))?attributes = req.body.attributes:attributes.push(req.body.attributes);
@@ -244,7 +244,7 @@ export default ({ config, dbs }) => {
       res.status(200).json({ status: 'failed', code : 500, message : 'Attributes is not array' });
     }
   });
-  
+
   freeradius.get('/userinfo', (req, res) => {
     return dbs.freeradius.userinfo.findOrCreate({
       where: {
@@ -256,7 +256,7 @@ export default ({ config, dbs }) => {
     })
       .catch(handleError(res));
   });
-  
+
   freeradius.post('/userinfo', (req, res) => {
     let userinfoData = req.body.userinfo;
     return upsert(dbs.freeradius.userinfo, {
@@ -287,7 +287,7 @@ export default ({ config, dbs }) => {
         res.status(200).json({ status: 'failed', code : 500, message : 'Error while saving data' });
       });
   });
-  
+
   freeradius.post('/disconnect/', (req, res) => {
     script.execPromise('freeradius disconnect '+req.body.user)
       .then( result => {
@@ -298,7 +298,7 @@ export default ({ config, dbs }) => {
         res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
       });
   });
-  
+
   freeradius.get('/check/:user', (req, res) => {
     let asyncs = [];
     let answer = {};
@@ -335,7 +335,7 @@ export default ({ config, dbs }) => {
       }
     });
   });
-  
+
   freeradius.get('/statistics/:user?', (req, res) => {
 		let answer = {};
 		let asyncs = [];
@@ -358,7 +358,7 @@ export default ({ config, dbs }) => {
 			})
 			.catch(handleError(res));
 		});
-	
+
 		asyncs.push( callback => {
 			dbs.freeradius.sequelize.query(sqlSource.sqlFindStatistics, { replacements: { username: req.params.user }, type: Sequelize.QueryTypes.SELECT })
 			.then(data => {
@@ -385,6 +385,6 @@ export default ({ config, dbs }) => {
 			}
 		});
   });
-  
+
   return freeradius
 }

@@ -20,7 +20,7 @@ import coova from './coova.js';
 export default ({ config, dbs }) => {
 	const api = new Router();
   let authService = authLib({ config, dbs });
-  
+
 	api.use('/auth'         , auth({ config, dbs }));
   api.use('/users'        , authService.isAuthenticated(), users({ config, dbs }));
   api.use('/cpu'          , authService.isAuthenticated(), cpu({ config, dbs }));
@@ -36,6 +36,6 @@ export default ({ config, dbs }) => {
   api.use('/portal'       , authService.isAuthenticated(), portal({ config, dbs }));
   api.use('/freeradius'   , authService.isAuthenticated(), freeradius({ config, dbs }));
   api.use('/coova'        , authService.isAuthenticated(), coova({ config, dbs }));
-  
+
   return api;
 }

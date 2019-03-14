@@ -31,6 +31,6 @@ export default function(sequelize, DataTypes) {
     updatedAt: false,
     deletedAt: false
   });
-  
+
   return radcheck;
 }

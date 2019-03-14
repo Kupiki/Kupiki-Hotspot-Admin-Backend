@@ -6,7 +6,7 @@ const Op = Sequelize.Op;
 
 export default callback => {
 	let dbs = {};
-	
+
   dbs.freeradius = {
     Sequelize,
     sequelize: new Sequelize(config.sequelize.freeradius)
@@ -47,7 +47,7 @@ export default callback => {
 
 	}).then(() => console.log('finished populating users'))
 		.catch(err => console.log('error populating users', err));
-  
+
   dbs.localDb.sequelize.sync().then(dbs.freeradius.sequelize.sync().then(callback(dbs)));
-  
+
 }

@@ -1,3 +1,6 @@
+**v2.4.2**
+- Code cleaning
+
 **v2.4.1**
 - Update of the gitignore file
 

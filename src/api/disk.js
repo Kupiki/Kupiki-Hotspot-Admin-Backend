@@ -5,10 +5,10 @@ import { formatBytes } from '../lib/util.js';
 const diskspace = require('diskspace');
 
 export default ({ config, db }) => resource({
-  
+
   /** Property name to store preloaded entity on `request`. */
   id : 'disk',
-  
+
   /** GET / - List all entities */
   index({ params }, res) {
     let disk = {
@@ -56,5 +56,5 @@ export default ({ config, db }) => resource({
       }
     });
   }
-  
+
 });
