@@ -12,7 +12,7 @@ export function register(socketToRegister) {
 
 export default ({ config, dbs }) => {
   const system = new Router();
-  
+
   system.get('/upgrade', (req, res) => {
     if (os.platform() === 'linux') {
       script.execPromise('system check')
@@ -26,7 +26,7 @@ export default ({ config, dbs }) => {
       res.status(200).json({ status: 'failed', code : -1, message : 'Unsupported platform' });
     }
   });
-  
+
   system.get('/reboot', (req, res) => {
     if (os.platform() === 'linux') {
       const reboot = script.exec('system reboot');
@@ -45,7 +45,7 @@ export default ({ config, dbs }) => {
       res.status(500).json({ status: 'failed', code : -1, message : 'Unsupported platform' });
     }
   });
-  
+
   system.get('/shutdown', (req, res) => {
     if (os.platform() === 'linux') {
       const shutdown = script.exec('system shutdown');
@@ -64,7 +64,7 @@ export default ({ config, dbs }) => {
       res.status(200).json({ status: 'failed', code : -1, message : 'Unsupported platform' });
     }
   });
-  
+
   system.get('/update', (req, res) => {
     if (socket) {
       socket.emit('system:update', {status: 'progress', result: ''});
@@ -88,7 +88,7 @@ export default ({ config, dbs }) => {
       res.status(500).json({ status: 'failed', code: -1, message: 'Socket not registred' });
     }
   });
-  
+
   return system;
 };
 

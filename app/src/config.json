@@ -1,5 +1,4 @@
 {
-	"port": 4000,
 	"bodyLimit": "200kb",
 	"secret": "kupiki-hotspot-admin-secret",
 	"corsHeaders": ["Link"],
@@ -8,7 +7,7 @@
 			"uri": "sqlite://",
 			"options": {
 				"logging": false,
-				"storage": "/var/local/kupiki/kupiki.sqlite",
+				"storage": "kupiki.sqlite",
 				"define": {
 					"timestamps": false
 				}
@@ -24,11 +23,13 @@
 			"operatorsAliases": false
 		}
 	},
-	"client": {
-		"host": "192.168.10.160",
-		"port": "3000"
-	},
 	"seedDB": true,
     "servicesFilters": ["chilli", "freeradius", "nginx", "hostapd", "mysql"],
-    "httpSudoTimeout": 10000
+	"httpSudoTimeout": 10000,
+	"rabbitMQ": {
+		"url": "amqp://localhost",
+		"kupiki_publish_queue": "kupiki.publish",
+		"kupiki_reply_queue": "kupiki.reply",
+		"timeout": 2000
+	}
 }

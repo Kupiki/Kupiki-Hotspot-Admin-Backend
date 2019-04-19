@@ -1,3 +1,6 @@
+**v3.0**
+- Integration within Docker
+
 **v2.4.2**
 - Code cleaning
 

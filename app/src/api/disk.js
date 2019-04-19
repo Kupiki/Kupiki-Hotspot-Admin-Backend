@@ -36,23 +36,24 @@ export default ({ config, db }) => resource({
         disk.chartMaxY = result.total;
 
         disk.chartData = [];
-        script.execPromise('data disk')
-          .then((result) => {
-            result.stdout.split('\n').forEach(function (elt) {
-              if (elt.indexOf(':') > 0) {
-                let stat = elt.split(':');
-                if (stat.length === 2) {
-                  stat[1] = parseFloat(stat[1].replace(',', '.'));
-                  disk.chartData.push(stat)
-                }
+        script.sendCommandRequest('data disk').then((result) => {
+          const responseJSON = JSON.parse(result);
+          if (responseJSON.status !== 'success') return res.status(500).json({ status: 'failed', code : 500, message : responseJSON.message });
+          responseJSON.message.split('\n').forEach((elt) => {
+            if (elt.indexOf(':') > 0) {
+              let stat = elt.split(':');
+              if (stat.length === 2) {
+                stat[1] = parseFloat(stat[1].replace(',', '.'));
+                disk.chartData.push(stat)
               }
-            });
-            disk.chartData = JSON.stringify(disk.chartData);
-            res.status(200).json({ status: 'success', code : 0, message : disk });
-          })
-          .catch(() => {
-            res.status(500).json({ status: 'failed', code : 500, message : disk });
-          })
+            }
+          });
+          disk.chartData = JSON.stringify(disk.chartData);
+          res.status(200).json({ status: 'success', code : 0, message : disk });
+        })
+        .catch((err) => {
+          res.status(500).json({ status: 'failed', code : 500, message : err.message });
+        })
       }
     });
   }

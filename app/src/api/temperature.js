@@ -4,10 +4,10 @@ const os = require('os');
 import * as script from '../lib/system.service.js';
 
 export default ({ config, db }) => resource({
-  
+
   /** Property name to store preloaded entity on `request`. */
   id : 'temperature',
-  
+
   /** GET / - List all entities */
   index({ params }, res) {
     if (os.platform() === 'linux') {
@@ -22,5 +22,5 @@ export default ({ config, db }) => resource({
       res.status(200).json({ status: 'failed', code : -1, message : 'Unsupported platform' });
     }
   }
-  
+
 });
