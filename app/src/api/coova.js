@@ -5,14 +5,14 @@ export default ({ config, dbs }) => {
   const coova = new Router();
 
   coova.get('/macauth', (req, res) => {
-    script.execPromise('coova getMacAuth')
-      .then( result => {
-        res.status(200).json({status: 'success', code: 0, message: JSON.parse(result.stdout) });
-      })
-      .catch( error => {
-        console.log(error);
-        res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
-      });
+    script.sendCommandRequest('macauth load').then((response) => {
+      const responseJSON = JSON.parse(response);
+      if (responseJSON.status !== 'success') return res.status(500).json({ status: 'failed', code : 500, message : responseJSON.message });
+      res.status(200).json({status: 'success', code: 0, message: responseJSON.message });
+    })
+    .catch( error => {
+      res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
+    });
   });
 
   coova.put('/macauth', (req, res) => {

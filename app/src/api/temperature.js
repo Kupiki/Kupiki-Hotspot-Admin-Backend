@@ -11,16 +11,15 @@ export default ({ config, db }) => resource({
   /** GET / - List all entities */
   index({ params }, res) {
     if (os.platform() === 'linux') {
-      script.execPromise('temperature')
-        .then(function (result) {
-          res.status(200).json({ status: 'success', code: 0, message: result.stdout.trim() });
-        })
-        .catch(function (err) {
-          res.status(200).json({ status: 'failed', code: err.code, message: err.stderr });
-        });
+      script.sendCommandRequest('temperature').then((response) => {
+        const responseJSON = JSON.parse(response);
+        if (responseJSON.status !== 'success') return res.status(500).json({ status: 'failed', code : 500, message : responseJSON.message });
+        res.status(200).json({ status: 'success', code : 0, message : responseJSON.message.trim() });
+      }).catch((err) => {
+        res.status(500).json({ status: 'failed', code : 500, message : err.message });
+      });
     } else {
       res.status(200).json({ status: 'failed', code : -1, message : 'Unsupported platform' });
     }
   }
-
 });

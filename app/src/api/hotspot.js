@@ -2,34 +2,33 @@ import resource from 'resource-router-middleware';
 import * as script from '../lib/system.service.js';
 
 export default ({ config, db }) => resource({
-  
+
   id : 'hotspot',
-  
+
   index({ params }, res) {
-    script.execPromise('hostapd load')
-      .then( result => {
-        let configuration = [];
-        result.stdout.split('\n').forEach(function(elt) {
-          if (elt.trim().length > 0) {
-            let arrTmp = elt.trim().split(/[=]+/);
-            configuration.push({
-              field: arrTmp[0],
-              value: arrTmp[1]
-            });
-          }
-        });
-        if (configuration.length === 0) {
-          res.status(200).json({status: 'failed', code: -1, message: 'No configuration found' });
-        } else {
-          res.status(200).json({status: 'success', code: 0, message: configuration });
+    script.sendCommandRequest('hostapd load').then((response) => {
+      const responseJSON = JSON.parse(response);
+      if (responseJSON.status !== 'success') return res.status(500).json({ status: 'failed', code : 500, message : responseJSON.message });
+      let configuration = [];
+      responseJSON.message.split('\n').forEach((elt) => {
+        if (elt.trim().length > 0) {
+          let arrTmp = elt.trim().split(/[=]+/);
+          configuration.push({
+            field: arrTmp[0],
+            value: arrTmp[1]
+          });
         }
-      })
-      .catch( error => {
-        console.log(error);
-        res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
       });
+      if (configuration.length === 0) {
+        res.status(500).json({status: 'failed', code: 500, message: 'No configuration found' });
+      } else {
+        res.status(200).json({status: 'success', code: 0, message: configuration });
+      }
+    }).catch((err) => {
+      res.status(500).json({ status: 'failed', code : 500, message : err.message });
+    });
   },
-  
+
   update({ params, body }, res) {
     if (params.hotspot === 'configuration' && typeof body.configuration !== 'undefined') {
       let fields = body.configuration;
@@ -74,7 +73,7 @@ export default ({ config, db }) => resource({
       res.status(200).json({status: 'failed', result: {code: -1, message: 'No configuration found in the request' }});
     }
   },
-  
+
   read({ params }, res) {
     if (params.hotspot === 'default') {
       const configuration = [{'field':'interface','value':'wlan0'},
@@ -88,7 +87,7 @@ export default ({ config, db }) => resource({
         {'field':'max_num_sta','value':'255'},
         {'field':'rts_threshold','value':'2347'},
         {'field':'fragm_threshold','value':'2346'}];
-  
+
       res.status(200).json({status: 'success', code: 0, message: configuration });
     }
     if (params.hotspot === 'configurationFields') {
@@ -179,7 +178,7 @@ export default ({ config, db }) => resource({
           data: {min: 256, max: 2346}
         }
       };
-  
+
       res.status(200).json({ status: 'success', code: 0, message: hotspotConfFields });
     }
   }
