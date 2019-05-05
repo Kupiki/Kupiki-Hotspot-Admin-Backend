@@ -25,49 +25,35 @@ export default ({ config, db }) => resource({
         res.status(200).json({status: 'success', code: 0, message: configuration });
       }
     }).catch((err) => {
-      res.status(500).json({ status: 'failed', code : 500, message : err.message });
+      res.status(200).json({ status: 'failed', code : 500, message : err.message });
     });
   },
 
   update({ params, body }, res) {
     if (params.hotspot === 'configuration' && typeof body.configuration !== 'undefined') {
       let fields = body.configuration;
-      let fs = require('fs');
-      fs.unlink('/tmp/hostapd.conf', error => {
-        if (error && error.code !== 'ENOENT') {
-          res.status(200).json({status: 'failed', code: error.errno, message: error });
+      let fileContent=''
+      fields.forEach(elt => {
+        fileContent += elt.field+'='+elt.value+'\n'
+      });
+      script.sendCommandRequest('hostapd save '+fileContent).then((response) => {
+        const responseJSON = JSON.parse(response);
+        if (responseJSON.status !== 'success') return res.status(500).json({ status: 'failed', code : 500, message : responseJSON.message });
+        console.log(body.restart)
+        if (body.restart) {
+          console.log('********')
+          script.sendCommandRequest('service restart hostapd').then((response) => {
+            res.status(200).json({status: 'success', code: 0, message: responseJSON.message });
+          })
+          .catch( error => {
+            res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
+          });
         } else {
-          let stream = fs.createWriteStream('/tmp/hostapd.conf');
-          stream.once('open', () => {
-            fields.forEach(elt => {
-              stream.write(elt.field+'='+elt.value+'\n');
-            });
-            stream.end();
-          });
-          stream.on('error', () => {
-            res.status(200).json({status: 'failed', code: -1, message: 'Unable to write the configuration file' });
-          });
-          stream.on('close', () => {
-            script.execPromise('hostapd save')
-              .then( () => {
-                if (body.restart) {
-                  script.execPromise('service hostapd restart')
-                    .then( () => {
-                      res.status(200).json({ status: 'success', code : 0, message : 'Configuration saved and service restarted' });
-                    })
-                    .catch(function (error) {
-                      res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
-                    });
-                } else {
-                  res.status(200).json({ status: 'success', code : 0, message : 'Configuration saved' });
-                }
-              })
-              .catch( error => {
-                console.log(error);
-                res.status(200).json({status: 'failed', code: -1, message: 'Unable to write the configuration file' });
-              });
-          });
+          console.log('******** 2')
+          res.status(200).json({ status: 'success', code : 0, message : 'Configuration saved' });
         }
+      }).catch((err) => {
+        res.status(200).json({ status: 'failed', code : 500, message : err.message });
       });
     } else {
       res.status(200).json({status: 'failed', result: {code: -1, message: 'No configuration found in the request' }});
@@ -134,10 +120,7 @@ export default ({ config, db }) => resource({
           'configured to allow both of these or only one. Open system authentication ' +
           'should be used with IEEE 802.1X.',
           type: 'select',
-          data: [{text: 'no authentication', value: 0}, {text: 'wpa', value: 1}, {text: 'wep', value: 2}, {
-            text: 'both',
-            value: 3
-          }]
+          data: [{text: 'no authentication', value: 0}, {text: 'wpa', value: 1}, {text: 'wep', value: 2}, {text: 'both', value: 3}]
         },
         beacon_int: {
           display: 'Beacon interval in kus',

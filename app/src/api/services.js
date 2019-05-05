@@ -41,15 +41,6 @@ export default ({ config, db }) => resource({
       }).catch((err) => {
         res.status(500).json({ status: 'failed', code : 500, message : err.message });
       });
-      // let command = 'service '+ params.services;
-      // body.status ? command += ' start' : command += ' stop';
-      // script.execPromise(command)
-      //   .then( () => {
-      //     res.status(200).json({ status: 'success', code : 0, message : '' });
-      //   })
-      //   .catch( error => {
-      //     res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
-      //   })
     } else {
       res.status(200).json({ status: 'failed', code : -1, message : 'Switch service - Unable to detect service' });
     }

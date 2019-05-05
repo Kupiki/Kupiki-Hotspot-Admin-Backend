@@ -72,18 +72,6 @@ export default ({ config, dbs }) => {
       }).catch((err) => {
         res.status(500).json({ status: 'failed', code : 500, message : err.message });
       });
-      // const shutdown = script.exec('system shutdown');
-      // shutdown.stderr.on('data', (data) => {
-      //   console.log(`shutdown stderr: ${data}`);
-      // });
-      // shutdown.on('close', (code) => {
-      //   if (code !== 0) {
-      //     console.log(`shutdown process exited with code ${code}`);
-      //     res.status(200).json({ status: 'failed', code : code, message : 'Shutdown process exited abnormaly.<br/>Check server logs.' });
-      //   } else {
-      //     res.status(200).json({ status: 'success', code : 0, message : 'Shutdown executed in one minute' });
-      //   }
-      // });
     } else {
       res.status(200).json({ status: 'failed', code : -1, message : 'Unsupported platform' });
     }
