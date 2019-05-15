@@ -39,9 +39,7 @@ export default ({ config, db }) => resource({
       script.sendCommandRequest('hostapd save '+fileContent).then((response) => {
         const responseJSON = JSON.parse(response);
         if (responseJSON.status !== 'success') return res.status(500).json({ status: 'failed', code : 500, message : responseJSON.message });
-        console.log(body.restart)
         if (body.restart) {
-          console.log('********')
           script.sendCommandRequest('service restart hostapd').then((response) => {
             res.status(200).json({status: 'success', code: 0, message: responseJSON.message });
           })
@@ -49,7 +47,6 @@ export default ({ config, db }) => resource({
             res.status(200).json({ status: 'failed', code : error.code, message : error.stderr });
           });
         } else {
-          console.log('******** 2')
           res.status(200).json({ status: 'success', code : 0, message : 'Configuration saved' });
         }
       }).catch((err) => {

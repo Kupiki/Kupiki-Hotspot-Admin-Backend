@@ -30,6 +30,6 @@
 		"url": "amqp://localhost",
 		"kupiki_publish_queue": "kupiki.publish",
 		"kupiki_reply_queue": "kupiki.reply",
-		"timeout": 2000
+		"timeout": 10000
 	}
 }
