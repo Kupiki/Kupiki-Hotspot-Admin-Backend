@@ -8,7 +8,7 @@ const validateJwt = expressJwt({
 
 export default ({ config, dbs }) => {
   let authService = {};
-  
+
   authService.isAuthenticated = () => {
     return compose()
     // Validate jwt
@@ -40,6 +40,6 @@ export default ({ config, dbs }) => {
           .catch(err => next(err));
       });
   };
-  
+
   return authService;
 }

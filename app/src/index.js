@@ -16,8 +16,8 @@ app.server = http.createServer(app);
 app.use(morgan('dev'));
 
 // 3rd party middleware
-let corsServer = 'http://'+ (process.env.CLIENT_HOST || config.client.host)
-const clientPort = (process.env.CLIENT_PORT || config.client.port)
+let corsServer = (process.env.CLIENT_PROTOCOL || 'http') + '://' + (process.env.CLIENT_HOST || 'localhost')
+const clientPort = (process.env.CLIENT_PORT || 3000)
 corsServer+= (clientPort !== '80' && clientPort !== '')?':'+clientPort:'';
 app.use(cors({
 	credentials: true,
@@ -44,7 +44,7 @@ initializeDb( dbs => {
 	// api router
 	app.use('/api', api({ config, dbs }));
 
-	app.server.listen(process.env.PORT || config.port, () => {
+	app.server.listen(process.env.SERVER_PORT || 4000, () => {
 		console.log(`Started on port ${app.server.address().port}`);
 	});
 });

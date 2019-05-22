@@ -4,10 +4,10 @@ import { formatBytes } from '../lib/util.js';
 const os = require('os');
 
 export default ({ config, db }) => resource({
-  
+
   /** Property name to store preloaded entity on `request`. */
   id : 'memory',
-  
+
   /** GET / - List all entities */
   index({ params }, res) {
     let memory = {
@@ -26,23 +26,23 @@ export default ({ config, db }) => resource({
     if (totalMem.value !== 0) memory.percent = 100*os.freemem()/os.totalmem();
     memory.chartMaxY = os.totalmem();
     memory.chartData = [];
-    script.execPromise('data memory')
-      .then( result => {
-        result.stdout.split('\n').forEach(function(elt) {
-          if (elt.indexOf(':') > 0) {
-            let stat = elt.split(':');
-            if (stat.length === 2) {
-              stat[1] = parseFloat(stat[1].replace(',', '.'));
-              memory.chartData.push(stat)
-            }
+    script.sendCommandRequest('data memory').then((response) => {
+      const responseJSON = JSON.parse(response);
+      if (responseJSON.status !== 'success') return res.status(500).json({ status: 'failed', code : 500, message : responseJSON.message });
+      responseJSON.message.split('\n').forEach(function(elt) {
+        if (elt.indexOf(':') > 0) {
+          let stat = elt.split(':');
+          if (stat.length === 2) {
+            stat[1] = parseFloat(stat[1].replace(',', '.'));
+            memory.chartData.push(stat)
           }
-        });
-        memory.chartData = JSON.stringify(memory.chartData);
-        res.status(200).json({ status: 'success', code : 0, message : memory });
-      })
-      .catch( () => {
-        res.status(500).json({ status: 'failed', code : 500, message : memory });
-      })
+        }
+      });
+      memory.chartData = JSON.stringify(memory.chartData);
+      res.status(200).json({ status: 'success', code : 0, message : memory });
+    })
+    .catch((err) => {
+      res.status(500).json({ status: 'failed', code : 500, message : err.message });
+    })
   }
-  
 });

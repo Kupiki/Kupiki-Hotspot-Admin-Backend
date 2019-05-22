@@ -12,7 +12,7 @@ function onConnect(socket) {
   socket.on('info', data => {
     socket.log(JSON.stringify(data, null, 2));
   });
-  
+
   // Insert sockets below
   console.log('**************** Socket registring ***************');
   require('../api/system').register(socket);
@@ -23,7 +23,7 @@ export default function(socketio) {
   // In order to see all the debug output, set DEBUG (in server/config/local.env.js) to including the desired scope.
   //
   // ex: DEBUG: "http*,socket.io:socket"
-  
+
   // We can authenticate socket.io users and access their token through socket.decoded_token
   //
   // 1. You will need to send the token in `client/components/socket/socket.services.js`
@@ -33,22 +33,22 @@ export default function(socketio) {
   //   secret: config.secrets.session,
   //   handshake: true
   // }));
-  
+
   socketio.on('connection', function(socket) {
     socket.address = `${socket.request.connection.remoteAddress}:${socket.request.connection.remotePort}`;
-    
+
     socket.connectedAt = new Date();
-    
+
     socket.log = function(...data) {
       console.log(`SocketIO ${socket.nsp.name} [${socket.address}]`, ...data);
     };
-    
+
     // Call onDisconnect.
     socket.on('disconnect', () => {
       onDisconnect(socket);
       socket.log('DISCONNECTED');
     });
-    
+
     // Call onConnect.
     onConnect(socket);
     socket.log('CONNECTED');
